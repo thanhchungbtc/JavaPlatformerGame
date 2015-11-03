@@ -206,7 +206,7 @@ public class GameScene extends Scene {
 		else if (input.contains("RIGHT"))
 			this.player.shouldMoveRight = true;
 		else {
-
+			this.player.shouldMoveLeft = false;
 			this.player.shouldMoveRight = false;
 		}
 		
@@ -215,7 +215,7 @@ public class GameScene extends Scene {
 		else {
 			this.player.shouldJump = false;
 		}
-	}			this.player.shouldMoveLeft = false;
+	}			
 	
 	private void moveMapCenterPlayer(double dt) {
 		Vector2D locationInMap = Vector2DHelper.SubstractVector(player.position, map.position);
