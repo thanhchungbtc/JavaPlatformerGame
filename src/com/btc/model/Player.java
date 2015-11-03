@@ -7,6 +7,7 @@ import com.btc.Vector2D;
 import com.btc.config.Config;
 import com.btc.helper.Utilities;
 import com.btc.helper.Vector2DHelper;
+import com.btc.model.Character.CharacterState;
 import com.sun.javafx.fxml.BeanAdapter;
 
 import javafx.scene.canvas.GraphicsContext;
@@ -37,29 +38,48 @@ public class Player extends Character {
 	public void loadAnimations() {
 		frameDictionary = new HashMap<CharacterState, AnimatedImage>();
 		frameDictionary.put(CharacterState.STANDING, new AnimatedImage(new Image[] {
-				new Image("sprites/Player1.png")				
-		}, 1));
-		frameDictionary.put(CharacterState.WALKING, new AnimatedImage(new Image[] {
+				new Image("sprites/Player1.png"),
 				new Image("sprites/Player2.png"),
 				new Image("sprites/Player3.png"),
-				new Image("sprites/Player4.png"),
+				new Image("sprites/Player4.png")
+		}, 0.5, true));
+		frameDictionary.put(CharacterState.WALKING, new AnimatedImage(new Image[] {
+				
+				new Image("sprites/Player16.png"),
+				new Image("sprites/Player17.png"),
+				new Image("sprites/Player18.png"),
+				new Image("sprites/Player19.png"),
+				new Image("sprites/Player20.png"),
+				new Image("sprites/Player21.png"),
+				new Image("sprites/Player22.png"),
+				new Image("sprites/Player23.png"),
+				new Image("sprites/Player24.png"),
+				new Image("sprites/Player25.png"),
+				new Image("sprites/Player26.png"),
+				new Image("sprites/Player27.png"),
+				new Image("sprites/Player28.png"),
+				new Image("sprites/Player29.png"),
+				new Image("sprites/Player30.png"),
+				new Image("sprites/Player31.png")
+		}, 0.1, true));
+		
+		frameDictionary.put(CharacterState.JUMP_UP, new AnimatedImage(new Image[] {
 				new Image("sprites/Player5.png"),
 				new Image("sprites/Player6.png"),
 				new Image("sprites/Player7.png"),
 				new Image("sprites/Player8.png"),
-				new Image("sprites/Player9.png")				
-		}, 0.1));
-		
-		frameDictionary.put(CharacterState.JUMP_UP, new AnimatedImage(new Image[] {
-				new Image("sprites/Player1.png"),
-				new Image("sprites/Player10.png"),
-				new Image("sprites/Player11.png"),
-				new Image("sprites/Player12.png")				
-		}, 0.1, false));
+				new Image("sprites/Player9.png")
+				
+		}, 0.05, false));
 		
 		frameDictionary.put(CharacterState.FALLING, new AnimatedImage(new Image[] {
-				new Image("sprites/Player10.png")				
-		}, 1));
+				new Image("sprites/Player10.png"),
+				new Image("sprites/Player11.png"),
+				new Image("sprites/Player12.png"),
+				new Image("sprites/Player13.png"),
+				new Image("sprites/Player14.png"),
+				new Image("sprites/Player15.png")
+		}, 0.05, false));
 		 this.changeState(CharacterState.STANDING);
 		
 	}
@@ -68,6 +88,7 @@ public class Player extends Character {
 	public void changeState(CharacterState newState) {
 		if (newState == this.characterState) return;
 		this.characterState = newState;
+		this.timeElapsedSinceStartAnimation = 0;
 		animation = frameDictionary.get(this.characterState);		
 	}
 	
