@@ -4,6 +4,7 @@ package com.btc.scene;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.SynchronousQueue;
 
@@ -17,6 +18,7 @@ import com.btc.model.Player;
 import com.btc.model.Sprite;
 import com.btc.model.Character.CharacterState;
 import com.btc.model.Crawler;
+import com.btc.model.Enemy;
 import com.sun.glass.ui.View;
 
 import javafx.animation.AnimationTimer;
@@ -41,6 +43,8 @@ public class GameScene extends Scene {
 
 	List<Sprite> sprites;
 	Image backgroundImage;
+	
+	List<Enemy> enemies;
 	private double gameHeight() {
 		return canvas.getHeight();
 	}
@@ -101,10 +105,12 @@ public class GameScene extends Scene {
 	}
 	
 	private void loadEnemies() {
+		enemies = new LinkedList<Enemy>();
 		crawler = new Crawler("sprites/Crawler1.png");
 		map.addChild(crawler);
 		crawler.player = player;
 		crawler.position = new Vector2D(800, 400);
+		enemies.add(crawler);
 	}
 	
 	private void checkAndResolveCollision(Character character) {
@@ -117,9 +123,9 @@ public class GameScene extends Scene {
 		{
 			int tileIndex = indices[i];
 			// calculate player's position relative to map
-			Vector2D playerPosition = Vector2DHelper.SubstractVector(character.desiredPosition, map.position);
+			Vector2D characterPosition = Vector2DHelper.SubstractVector(character.desiredPosition, map.position);
 			
-			Vector2D characterCoord = map.coordForPoint(playerPosition);
+			Vector2D characterCoord = map.coordForPoint(characterPosition);
 			
 			
 			int tileColumn = tileIndex % 3;
@@ -132,7 +138,7 @@ public class GameScene extends Scene {
 			characterRect = new Rect(characterRect.x - map.position.x, characterRect.y - map.position.y,
 					characterRect.width, characterRect.height);
 			Rect tileRect = map.rectFromCoord(tileCoord);
-			
+		
 			if (CollisionsHelper.RectIntersectsRect(characterRect, tileRect)) {
 				Rect intersection = CollisionsHelper.RectIntersection(characterRect, tileRect);
 				if (tileIndex == 7) {
@@ -143,12 +149,14 @@ public class GameScene extends Scene {
 				} else if (tileIndex == 1) {
 					character.desiredPosition = new Vector2D(character.desiredPosition.x, character.desiredPosition.y + intersection.height);
 					character.velocity = new Vector2D(character.velocity.x, 0);
+					
 				} else if (tileIndex == 3) {
 					character.desiredPosition = new Vector2D(character.desiredPosition.x + intersection.width, character.desiredPosition.y);
 					character.setOnWall(true);
-				} else if (tileColumn == 5) {
+				} else if (tileIndex == 5) {
 					character.desiredPosition = new Vector2D(character.desiredPosition.x - intersection.width, character.desiredPosition.y);
 					character.setOnWall(true);
+					
 				} else 
 				{
 					if (intersection.width > intersection.height)
@@ -251,15 +259,15 @@ public class GameScene extends Scene {
 		if (dt > 0.03) dt = 0.03;
 		lastUpdateTime = currentTime;
 
-		player.update(dt);
-		crawler.update(dt);
+		map.update(dt);
 		
 		this.checkAndResolveCollision(player);
-		this.checkAndResolveCollision(crawler);
 		
-		System.out.println(crawler.velocity.x);
+		for (Enemy enemy: enemies) {
+			this.checkAndResolveCollision(crawler);
+		}		
 		
-		moveMapCenterPlayer(dt);
+		 moveMapCenterPlayer(dt);
 		// for debug purpose
 		if (debugInterval >= 30) {
 			debugInterval = 0;

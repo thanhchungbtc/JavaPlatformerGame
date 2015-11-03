@@ -16,6 +16,10 @@ public abstract class GameObject extends Sprite {
 		
 	}
 	
+	public GameObject() {
+		// TODO Auto-generated constructor stub
+	}
+	
 	@Override
 	public void update(double dt) {
 				

@@ -1,5 +1,7 @@
 package com.btc.model;
 
+import javax.jws.soap.InitParam;
+
 import com.btc.Rect;
 import com.btc.Vector2D;
 import com.btc.config.Config;
@@ -54,13 +56,13 @@ public class Crawler extends Enemy {
 
 		double distance = Vector2DHelper.DistanceBetweeen(this.player.position, this.position); 
 
-//		if (distance > 1000) {
-//			this.desiredPosition = this.position;
-//			// this.isActive = false;
-//			return;
-//		} else {
-//			// this.isActive = true
-//		}
+		if (distance > 1000) {
+			this.desiredPosition = this.position;
+//			 this.isActive = false;
+			return;
+		} else {
+//			 this.isActive = true
+		}
 
 		if (this.onGround) {
 			this.changeState(CharacterState.WALKING);
@@ -77,15 +79,16 @@ public class Crawler extends Enemy {
 		
 		if (this.onWall) {
 			this.velocity = new Vector2D(-this.velocity.x, this.velocity.y);
+			
 		}
 	}
 
 	@Override
 	public Rect collisionBoundingBox() {
-
+		// TODO Auto-generated method stub
 		return super.collisionBoundingBox();
 	}
-
+	
 	@Override
 	public void update(double dt) {
 		// logic comes here
@@ -94,14 +97,11 @@ public class Crawler extends Enemy {
 		Vector2D gravity = Config.Gravity;
 		Vector2D gravityStep = Vector2DHelper.MutilByScalar(gravity, dt);		
 		this.velocity = Vector2DHelper.AddVector(this.velocity, gravityStep);		
-		// clamp velocity
-		//				 velocity = new Vector2D(Utilities.clamp(velocity.x, -Config.PlayerProperties.MaxMoveSpeed, Config.PlayerProperties.MaxMoveSpeed),
-		//						Utilities.clamp(velocity.y, 0, 450));
+	
 		this.velocity = Vector2DHelper.clamped(this.velocity, Config.CrawlerProperties.MaxMoveSpeed, 450.0);		
 		this.velocity = new Vector2D(this.velocity.x * 0.85, this.velocity.y);
 		Vector2D velocityStep = Vector2DHelper.MutilByScalar(this.velocity, dt);				
 		this.desiredPosition = Vector2DHelper.AddVector(this.position, velocityStep);
-
 
 		super.update(dt);
 	}

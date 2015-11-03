@@ -17,8 +17,7 @@ public abstract class Character extends GameObject {
 	protected AnimatedImage animation;
 	
 	protected CharacterState characterState;
-
-	
+		
 	protected boolean onGround = false;
 	protected boolean onWall = false;
 

@@ -22,8 +22,8 @@ public class Config {
 		public final static double MaxMoveSpeed = 650;
 		public final static double WalkingAccelerate = 2500;
 		
-		public final static int Width = 38;
-		public final static int Height = 30;
+		public final static int Width = 30;
+		public final static int Height = 38;
 	}
 	
 	public static class CrawlerProperties {

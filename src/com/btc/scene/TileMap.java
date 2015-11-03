@@ -13,7 +13,7 @@ import com.btc.model.Sprite;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
-public class TileMap extends Sprite {
+public class TileMap extends GameObject {
 	
 
 	List<Sprite> children = new ArrayList<Sprite>();
@@ -21,14 +21,15 @@ public class TileMap extends Sprite {
 		super(imageNamed);
 		// TODO Auto-generated constructor stub
 	}
+	
+	public TileMap() {
+		// TODO Auto-generated constructor stub
+	}
 
 	public void addChild(Sprite sprite) {
 		children.add(sprite);
 	}
 	
-	public TileMap() {
-		
-	}
 	public int mapWidth = 500;
 	public int mapHeight = 25;
 
@@ -69,6 +70,13 @@ public class TileMap extends Sprite {
 			sprite.position = Vector2DHelper.SubstractVector(sprite.position, offset); 
 		}
 		this.position = position;
+	}
+	
+	@Override
+	public void update(double dt) {
+		for (Sprite sprite : this.children) {
+			sprite.update(dt);
+		}
 	}
 	
 	public void render(GraphicsContext gc) {	
