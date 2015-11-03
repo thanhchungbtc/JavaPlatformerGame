@@ -25,7 +25,8 @@ public class Player extends Character {
 		// TODO Auto-generated method stub
 		super.setTexture(newImage);
 	}
-	@Override
+	
+	@Override	
 	public Rect collisionBoundingBox() {
 		Rect bounding = new Rect(this.desiredPosition.x - Config.PlayerProperties.Width / 2, 
 				this.desiredPosition.y - Config.PlayerProperties.Height / 2,
@@ -36,48 +37,32 @@ public class Player extends Character {
 	
 	@Override
 	public void loadAnimations() {
-		frameDictionary = new HashMap<CharacterState, AnimatedImage>();
+		
 		frameDictionary.put(CharacterState.STANDING, new AnimatedImage(new Image[] {
-				new Image("file:sprites/Player1.png"),
-				new Image("file:sprites/Player2.png"),				
 				new Image("file:sprites/Player1.png")
 		}, 0.2, true));
 		frameDictionary.put(CharacterState.WALKING, new AnimatedImage(new Image[] {
 				
-				//new Image("sprites/Player16.png"),
-				//new Image("sprites/Player17.png"),
-				new Image("file:sprites/Player18.png"),
-				new Image("file:sprites/Player19.png"),
-				new Image("file:sprites/Player20.png"),
-				new Image("file:sprites/Player21.png"),
-				new Image("file:sprites/Player22.png"),
-				new Image("file:sprites/Player23.png"),
-				new Image("file:sprites/Player24.png"),
-				new Image("file:sprites/Player25.png"),
-				new Image("file:sprites/Player26.png"),
-				new Image("file:sprites/Player27.png"),
-				new Image("file:sprites/Player28.png"),
-				new Image("file:sprites/Player29.png"),
-				new Image("file:sprites/Player30.png"),
-				new Image("file:sprites/Player31.png")
-		}, 0.06, true));
-		
-		frameDictionary.put(CharacterState.JUMP_UP, new AnimatedImage(new Image[] {
+				new Image("file:sprites/Player2.png"),
+				new Image("file:sprites/Player3.png"),
+				new Image("file:sprites/Player4.png"),
 				new Image("file:sprites/Player5.png"),
 				new Image("file:sprites/Player6.png"),
 				new Image("file:sprites/Player7.png"),
 				new Image("file:sprites/Player8.png"),
 				new Image("file:sprites/Player9.png")
+		}, 0.06, true));
+		
+		frameDictionary.put(CharacterState.JUMP_UP, new AnimatedImage(new Image[] {
+				new Image("file:sprites/Player1.png"),
+				new Image("file:sprites/Player10.png"),
+				new Image("file:sprites/Player11.png"),
+				new Image("file:sprites/Player12.png")
 				
 		}, 0.05, false));
 		
 		frameDictionary.put(CharacterState.FALLING, new AnimatedImage(new Image[] {
-				new Image("file:sprites/Player10.png"),
-				new Image("file:sprites/Player11.png"),
-				new Image("file:sprites/Player12.png"),
-				new Image("file:sprites/Player13.png"),
-				new Image("file:sprites/Player14.png"),
-				new Image("file:sprites/Player15.png")
+				new Image("file:sprites/Player10.png")
 		}, 0.05, false));
 		 this.changeState(CharacterState.STANDING);
 		
@@ -85,97 +70,11 @@ public class Player extends Character {
 	
 	@Override
 	public void changeState(CharacterState newState) {
-		if (newState == this.characterState) return;
-		this.characterState = newState;
-		this.timeElapsedSinceStartAnimation = 0;
-		animation = frameDictionary.get(this.characterState);		
+		super.changeState(newState);
 	}
 	
-	@Override
-	public CharacterState getCurrentState() {
-		if (!this.onGround) characterState = CharacterState.FALLING;
-		else if (velocity.y < 0) characterState = CharacterState.JUMP_UP;
-		else if (velocity.x == 0 ) {
-			characterState = CharacterState.STANDING;
-		} else {
-			characterState = CharacterState.WALKING;
-		}
-		return characterState;
-	}
-	/*
-	private void updateState(double dt) {
-		// get current State
-		
-		CharacterState newState = getCurrentState();
-		
-		switch (characterState) {
-		case STANDING:
-			Vector2D moveForce = Vector2D.zero;
-			if (shouldMoveLeft) moveForce = new Vector2D(-Config.PlayerProperties.WalkingAccelerate, moveForce.y);
-			else if (shouldMoveRight) moveForce = new Vector2D(Config.PlayerProperties.WalkingAccelerate, moveForce.y);
-						
-			Vector2D moveForceStep = Vector2DHelper.MutilByScalar(moveForce, dt);
-			if (shouldJump) {
-				moveForceStep = new Vector2D(moveForceStep.x, -Config.PlayerProperties.JumpForce);				
-			}
-			this.velocity = Vector2DHelper.AddVector(this.velocity, moveForceStep);
-			
-			if (moveForce.y != 0)
-				newState = CharacterState.JUMP_UP;
-			else if (moveForce.x != 0)
-				newState = CharacterState.WALKING;			
-			break;
-		case WALKING:
-			moveForce = Vector2D.zero;
-			if (shouldMoveLeft) moveForce = new Vector2D(-Config.PlayerProperties.WalkingAccelerate, moveForce.y);
-			else if (shouldMoveRight) moveForce = new Vector2D(Config.PlayerProperties.WalkingAccelerate, moveForce.y);
-			moveForceStep = Vector2DHelper.MutilByScalar(moveForce, dt);
-			if (shouldJump) {
-				moveForceStep = new Vector2D(moveForceStep.x, -Config.PlayerProperties.JumpForce);
-			}
-			
-			this.velocity = Vector2DHelper.AddVector(this.velocity, moveForceStep);
-			
-			if (moveForce.y != 0)
-				newState = CharacterState.JUMP_UP;
-			else if (!shouldMoveLeft && !shouldMoveRight)
-				newState = CharacterState.STANDING;
-			break;
-		case JUMP_UP:
-			moveForce = Vector2D.zero;
-			if (shouldMoveLeft) moveForce = new Vector2D(-Config.PlayerProperties.WalkingAccelerate, moveForce.y);
-			else if (shouldMoveRight) moveForce = new Vector2D(Config.PlayerProperties.WalkingAccelerate, moveForce.y);
-			moveForceStep = Vector2DHelper.MutilByScalar(moveForce, dt);
-			
-			
-			this.velocity = Vector2DHelper.AddVector(this.velocity, moveForceStep);
-			
-			if (this.velocity.y > 0) {
-				newState = CharacterState.FALLING;
-			}
-			break;
-		case FALLING:
-			moveForce = Vector2D.zero;
-			if (shouldMoveLeft) moveForce = new Vector2D(-Config.PlayerProperties.WalkingAccelerate, moveForce.y);
-			else if (shouldMoveRight) moveForce = new Vector2D(Config.PlayerProperties.WalkingAccelerate, moveForce.y);
-			
-			moveForceStep = Vector2DHelper.MutilByScalar(moveForce, dt);
-			this.velocity = Vector2DHelper.AddVector(this.velocity, moveForceStep);
-			
-			if (this.onGround) {
-				newState = CharacterState.STANDING;
-			}
-			break;
-
-		default:
-			break;
-		}
-		
-		
-		this.changeState(newState);
-	}
-	*/
-	private void updateState(double dt) {
+	@Override	
+	protected void updateState(double dt) {
 		CharacterState newState = this.characterState;
 
 		  Vector2D joyForce = Vector2D.zero;
@@ -210,7 +109,6 @@ public class Player extends Character {
 			  newState = CharacterState.FALLING;
 		 this.changeState(newState);
 	}
-
 	
 	public Player(String imageNamed) {
 		super(imageNamed);		

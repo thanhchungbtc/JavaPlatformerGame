@@ -16,6 +16,7 @@ import com.btc.model.Character;
 import com.btc.model.Player;
 import com.btc.model.Sprite;
 import com.btc.model.Character.CharacterState;
+import com.btc.model.Crawler;
 import com.sun.glass.ui.View;
 
 import javafx.animation.AnimationTimer;
@@ -36,6 +37,7 @@ public class GameScene extends Scene {
 	long lastUpdateTime = 0;
 	TileMap map;
 	Player player;
+	Crawler crawler;
 
 	List<Sprite> sprites;
 	Image backgroundImage;
@@ -98,8 +100,15 @@ public class GameScene extends Scene {
 		player.position = new Vector2D(100, 300);
 	}
 	
+	private void loadEnemies() {
+		crawler = new Crawler("sprites/Crawler1.png");
+		map.addChild(crawler);
+		crawler.player = player;
+		crawler.position = new Vector2D(800, 400);
+	}
+	
 	private void checkAndResolveCollision(Character character) {
-				
+			
 		character.setOnGround(false);
 		character.setOnWall(false);
 		
@@ -109,9 +118,9 @@ public class GameScene extends Scene {
 			int tileIndex = indices[i];
 			// calculate player's position relative to map
 			Vector2D playerPosition = Vector2DHelper.SubstractVector(character.desiredPosition, map.position);
-			//System.out.println(playerPosition.x + ", " + playerPosition.y);
+			
 			Vector2D characterCoord = map.coordForPoint(playerPosition);
-			//System.out.println(characterCoord.x + ", " + characterCoord.y);
+			
 			
 			int tileColumn = tileIndex % 3;
 			int tileRow = tileIndex / 3;
@@ -167,7 +176,7 @@ public class GameScene extends Scene {
 			              }
 			              character.desiredPosition = new Vector2D(character.desiredPosition.x + resolutionWidth, character.desiredPosition.y);
 			              if (tileIndex == 6 || tileIndex == 8) {
-			                //character.onWall = true
+			                character.setOnWall(true);
 			              }
 			              character.velocity = new Vector2D(0.0, character.velocity.y);
 			            }
@@ -198,6 +207,7 @@ public class GameScene extends Scene {
 		sprites = new ArrayList<Sprite>();
 
 		setupPlayer();
+		loadEnemies();
 	}
 	
 	public void handleEvents(List<String> input) {
@@ -224,14 +234,14 @@ public class GameScene extends Scene {
 			Vector2D centerOfView = new Vector2D(gameWidth() / 2, gameHeight() / 2);
 			double distanceToCenter = player.position.x - centerOfView.x;
 			map.setPosition(new Vector2D(map.position.x - distanceToCenter, map.position.y));
-			player.position = new Vector2D(player.position.x - distanceToCenter, player.position.y);
+			//player.position = new Vector2D(player.position.x - distanceToCenter, player.position.y);
 		} 
 		if (locationInMap.y > gameHeight() / 2 && locationInMap.y < map.mapHeightInPixel() - gameHeight() / 2) {
 			
 			Vector2D centerOfView = new Vector2D(gameWidth() / 2, gameHeight() / 2);
 			double distanceToCenter = player.position.y - centerOfView.y;
 			map.setPosition(new Vector2D(map.position.x, map.position.y - distanceToCenter));
-			player.position = new Vector2D(player.position.x, player.position.y - distanceToCenter);
+			//player.position = new Vector2D(player.position.x, player.position.y - distanceToCenter);
 		} 
 		
 	}
@@ -242,9 +252,12 @@ public class GameScene extends Scene {
 		lastUpdateTime = currentTime;
 
 		player.update(dt);
+		crawler.update(dt);
 		
 		this.checkAndResolveCollision(player);
-
+		this.checkAndResolveCollision(crawler);
+		
+		System.out.println(crawler.velocity.x);
 		
 		moveMapCenterPlayer(dt);
 		// for debug purpose
@@ -263,8 +276,6 @@ public class GameScene extends Scene {
 		//gc.drawImage(backgroundImage, 0, 0);
 		
 		map.render(gc);
-	
-		player.render(gc);
 
 		// for debug purpose	
 		gc.setStroke(Color.AQUA);

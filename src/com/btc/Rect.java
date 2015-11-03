@@ -1,6 +1,5 @@
 package com.btc;
 
-
 public class Rect {
 	public double x;
 	public double y;

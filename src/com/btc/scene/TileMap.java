@@ -63,11 +63,11 @@ public class TileMap extends Sprite {
 	}
 	
 	public void setPosition(Vector2D position) {
-		Vector2D diff = Vector2DHelper.SubstractVector(position, this.position);
+		Vector2D offset = Vector2DHelper.SubstractVector(this.position, position);
+		// set position for childred, because children's position relative to map's position
 		for (Sprite sprite: this.children) {
-			//sprite.position = Vector2DHelper.AddVector(sprite.position, diff); 
+			sprite.position = Vector2DHelper.SubstractVector(sprite.position, offset); 
 		}
-		
 		this.position = position;
 	}
 	
@@ -81,7 +81,6 @@ public class TileMap extends Sprite {
 			double dy = this.position.y + row * tileHeight;
 			double dx = this.position.x + col * tileWidth;
 			
-			
 			int tileRow = gid / 5;
 			int tileCol = gid % 5;
 			int sx = tileCol * 32;
@@ -90,9 +89,9 @@ public class TileMap extends Sprite {
 			gc.drawImage(tileset, sx, sy, 32, 32, dx, dy, tileWidth, tileHeight);
 		}
 		
-//		for (Sprite sprite : this.children) {
-//			sprite.render(gc);
-//		}
+		for (Sprite sprite : this.children) {
+			sprite.render(gc);
+		}
 	}
 	
 	public static int[] data = {

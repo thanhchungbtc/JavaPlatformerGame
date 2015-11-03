@@ -1,5 +1,6 @@
 package com.btc.model;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.btc.Rect;
@@ -9,7 +10,7 @@ import com.btc.scene.TileMap;
 
 public abstract class Character extends GameObject {
 	public enum CharacterState {
-		STANDING, WALKING, JUMP_UP, FALLING
+		STANDING, WALKING, JUMP_UP, FALLING, DYING, DEAD
 	}
 	protected Map<CharacterState, AnimatedImage> frameDictionary;	
 	protected double timeElapsedSinceStartAnimation; // second	
@@ -24,8 +25,6 @@ public abstract class Character extends GameObject {
 	public Vector2D desiredPosition;
 	public Vector2D velocity = Vector2D.zero;
 	
-	public CharacterState getCurrentState() { return CharacterState.STANDING;}
-	
 	public void setOnGround(boolean onGround) {
 		this.onGround = onGround;
 		if (this.onGround) 
@@ -34,9 +33,11 @@ public abstract class Character extends GameObject {
 	
 	public void setOnWall(boolean onWall) {
 		this.onWall = onWall;
-//		if (this.onWall)
-//			this.velocity = new Vector2D(0, this.velocity.y);
+		if (this.onWall)
+			this.velocity = new Vector2D(0, this.velocity.y);
 	}
+	
+	public boolean getOnWall() { return this.onWall; }
 	
 	public Rect collisionBoundingBox() {
 		return new Rect(desiredPosition.x - this.size.width / 2, desiredPosition.y - this.size.height / 2, this.size.width, this.size.height);
@@ -44,12 +45,22 @@ public abstract class Character extends GameObject {
 	
 	public void loadAnimations() {}
 	
-	public void changeState(CharacterState newState) {}
+	public void changeState(CharacterState newState) {
+		if (newState == this.characterState) return;
+		this.characterState = newState;
+		this.timeElapsedSinceStartAnimation = 0;
+		animation = frameDictionary.get(this.characterState);	
+	}
 
 	public Character(String imageNamed) {
 		super(imageNamed);
+		frameDictionary = new HashMap<CharacterState, AnimatedImage>();
 		this.timeElapsedSinceStartAnimation = 0;
 		this.loadAnimations();
+	}
+	
+	protected void updateState(double dt) {
+		
 	}
 	
 	@Override
