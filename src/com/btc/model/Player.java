@@ -32,56 +32,16 @@ public class Player extends Character {
 				this.desiredPosition.y - Config.PlayerProperties.Height / 2,
 				Config.PlayerProperties.Width, 
 				Config.PlayerProperties.Height);
-		return new Rect(bounding.x, bounding.y + 3, bounding.width, bounding.height);
+		return new Rect(bounding.x, bounding.y, bounding.width, bounding.height);
 	}
 	
 	@Override
 	public void loadAnimations() {
-		
-		frameDictionary.put(CharacterState.STANDING, new AnimatedImage(new Image[] {
-				new Image("file:sprites/Player1.png"),
-				new Image("file:sprites/Player2.png"),				
-				new Image("file:sprites/Player1.png")
-		}, 0.2, true));
-		frameDictionary.put(CharacterState.WALKING, new AnimatedImage(new Image[] {
-				
-				//new Image("sprites/Player16.png"),
-				//new Image("sprites/Player17.png"),
-				new Image("file:sprites/Player18.png"),
-				new Image("file:sprites/Player19.png"),
-				new Image("file:sprites/Player20.png"),
-				new Image("file:sprites/Player21.png"),
-				new Image("file:sprites/Player22.png"),
-				new Image("file:sprites/Player23.png"),
-				new Image("file:sprites/Player24.png"),
-				new Image("file:sprites/Player25.png"),
-				new Image("file:sprites/Player26.png"),
-				new Image("file:sprites/Player27.png"),
-				new Image("file:sprites/Player28.png"),
-				new Image("file:sprites/Player29.png"),
-				new Image("file:sprites/Player30.png"),
-				new Image("file:sprites/Player31.png")
-		}, 0.06, true));
-		
-		frameDictionary.put(CharacterState.JUMP_UP, new AnimatedImage(new Image[] {
-				new Image("file:sprites/Player5.png"),
-				new Image("file:sprites/Player6.png"),
-				new Image("file:sprites/Player7.png"),
-				new Image("file:sprites/Player8.png"),
-				new Image("file:sprites/Player9.png")
-				
-		}, 0.05, false));
-		
-		frameDictionary.put(CharacterState.FALLING, new AnimatedImage(new Image[] {
-				new Image("file:sprites/Player10.png"),
-				new Image("file:sprites/Player11.png"),
-				new Image("file:sprites/Player12.png"),
-				new Image("file:sprites/Player13.png"),
-				new Image("file:sprites/Player14.png"),
-				new Image("file:sprites/Player15.png")
-		}, 0.05, false));
-		 this.changeState(CharacterState.STANDING);
-		
+		frameDictionary.put(CharacterState.STANDING, this.loadAnimations("Player", "standingAnim", true));
+		frameDictionary.put(CharacterState.WALKING, this.loadAnimations("Player", "walkingAnim", true));
+		frameDictionary.put(CharacterState.JUMP_UP, this.loadAnimations("Player", "jumpUpAnim", false));
+		frameDictionary.put(CharacterState.FALLING, this.loadAnimations("Player", "fallingAnim", false));		
+		this.changeState(CharacterState.STANDING);	
 	}
 	
 	@Override

@@ -8,6 +8,9 @@ import com.btc.Vector2D;
 import com.btc.model.Character.CharacterState;
 import com.btc.scene.TileMap;
 
+import javafx.scene.image.Image;
+import xmlwise.Plist;
+
 public abstract class Character extends GameObject {
 	public enum CharacterState {
 		STANDING, WALKING, JUMP_UP, FALLING, DYING, DEAD
@@ -64,7 +67,6 @@ public abstract class Character extends GameObject {
 	
 	@Override
 	public void update(double dt) {
-		
 		// setup current frame for animation purpose
 		this.flipX = this.velocity.x < 0;
 		this.timeElapsedSinceStartAnimation += dt;		
@@ -72,5 +74,25 @@ public abstract class Character extends GameObject {
 		animation = frameDictionary.get(this.characterState);
 		this.setTexture(animation.getFrame(elapsedTime));
 	}
+	protected AnimatedImage loadAnimations(String className, String animationName, boolean repeat) {
+		try {
+			Map<String, Object> root = Plist.load("data/" + className + ".plist");
+			Map<String, Object> properties = (Map<String, Object>)root.get(animationName);
+			String[] imageNames = properties.get("animationFrames").toString().split(",");
+			double duration = Double.valueOf(properties.get("delay").toString());
+			
+			Image[] images = new Image[imageNames.length];
+			for (int i = 0; i < images.length; i++) {
+				images[i] = new Image("sprites/" + className + imageNames[i] + ".png");
+			}
+			AnimatedImage result = new AnimatedImage(images, duration, repeat);
+			return result;
+			
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
+		return null;
+	}
+	
 
 }

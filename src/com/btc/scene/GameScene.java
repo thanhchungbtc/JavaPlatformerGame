@@ -205,7 +205,7 @@ public class GameScene extends Scene {
 	public GameScene() {
 		super(new Group());
 		setupGameLoop();		
-		backgroundImage = new Image("images/city1-1.png");
+		backgroundImage = new Image("images/city1-2.png");
 		map = new TileMap();
 		double gameHeight = this.gameHeight();
 		double diffHeight = map.mapHeightInPixel() - gameHeight;
@@ -280,8 +280,8 @@ public class GameScene extends Scene {
 	public void render(GraphicsContext gc) {
 		// clear canvas
 		gc.clearRect(0, 0, Config.WindowProperties.WINDOW_WIDTH, Config.WindowProperties.WINDOW_HEIGHT);
-		gc.fillRect(0, 0, Config.WindowProperties.WINDOW_WIDTH, Config.WindowProperties.WINDOW_HEIGHT);
-		//gc.drawImage(backgroundImage, 0, 0);
+		// gc.fillRect(0, 0, Config.WindowProperties.WINDOW_WIDTH, Config.WindowProperties.WINDOW_HEIGHT);
+		gc.drawImage(backgroundImage, 0, 0);
 		
 		map.render(gc);
 
