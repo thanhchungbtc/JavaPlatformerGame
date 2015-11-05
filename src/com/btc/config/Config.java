@@ -28,6 +28,7 @@ public class Config {
 	
 	public static class CrawlerProperties {
 		public final static double MaxMoveSpeed = 100;
+		public final static double JumpForce = 250;
 	}
 	
 	

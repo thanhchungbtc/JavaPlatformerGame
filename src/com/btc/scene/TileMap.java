@@ -28,6 +28,12 @@ public class TileMap extends GameObject {
 
 	public void addChild(Sprite sprite) {
 		children.add(sprite);
+
+	}
+	
+	public boolean hasWallAtTileCoord(Vector2D tileCoord) {
+		int index = (int)tileCoord.y * this.mapWidth + (int)tileCoord.x;
+		return this.data[index] > 0;
 	}
 	
 	public int mapWidth = 500;
@@ -72,12 +78,6 @@ public class TileMap extends GameObject {
 		this.position = position;
 	}
 	
-	@Override
-	public void update(double dt) {
-		for (Sprite sprite : this.children) {
-			sprite.update(dt);
-		}
-	}
 	
 	public void render(GraphicsContext gc) {	
 		for (int i = 0; i < mapWidth * mapHeight; i++) {

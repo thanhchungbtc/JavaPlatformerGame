@@ -19,7 +19,7 @@ import com.btc.model.Sprite;
 import com.btc.model.Character.CharacterState;
 import com.btc.model.Crawler;
 import com.btc.model.Enemy;
-import com.sun.glass.ui.View;
+import com.btc.model.MeanCrawler;
 
 import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
@@ -40,6 +40,7 @@ public class GameScene extends Scene {
 	TileMap map;
 	Player player;
 	Crawler crawler;
+	MeanCrawler meanCrawler;
 
 	List<Sprite> sprites;
 	Image backgroundImage;
@@ -111,6 +112,13 @@ public class GameScene extends Scene {
 		crawler.player = player;
 		crawler.position = new Vector2D(800, 400);
 		enemies.add(crawler);
+		
+		meanCrawler = new MeanCrawler("sprites/MeanCrawler1.png");
+		meanCrawler.player = player;
+		meanCrawler.map = map;
+		map.addChild(meanCrawler);
+		meanCrawler.position = new Vector2D(500, 400);
+		enemies.add(meanCrawler);
 	}
 	
 	private void checkAndResolveCollision(Character character) {
@@ -259,12 +267,12 @@ public class GameScene extends Scene {
 		if (dt > 0.03) dt = 0.03;
 		lastUpdateTime = currentTime;
 
-		map.update(dt);
-		
+		player.update(dt);		
 		this.checkAndResolveCollision(player);
 		
 		for (Enemy enemy: enemies) {
-			this.checkAndResolveCollision(crawler);
+			enemy.update(dt);
+			this.checkAndResolveCollision(enemy);
 		}		
 		
 		 moveMapCenterPlayer(dt);
