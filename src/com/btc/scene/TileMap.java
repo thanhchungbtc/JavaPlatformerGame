@@ -25,6 +25,12 @@ import xmlwise.Xmlwise;
 
 public class TileMap extends GameObject {
 
+	static final String[] levelBackgrounds = {"city", "cave", "hell" };
+	static final int[][] numPerLayers = {
+			{6, 6, 4, 2},
+			{6, 5, 4, 2},
+			{6, 6, 4, 0}
+	};
 	public int mapWidth;
 	public int mapHeight;
 
@@ -39,6 +45,11 @@ public class TileMap extends GameObject {
 	public List<PowerUp> powerUps;
 	public Player player;
 	public Vector2D exitPoint;
+	public List<Sprite> backgroundLayer1;
+	public List<Sprite> backgroundLayer2;
+	public List<Sprite> backgroundLayer3;
+	public List<Sprite> backgroundLayer4;
+	public int currentLevel;
 	private void loadMapFromXML(String fileName) {
 		try {
 			XmlElement root = Xmlwise.loadXml("levels/" + fileName);
@@ -143,15 +154,47 @@ public class TileMap extends GameObject {
 		}
 	}
 	
-	public TileMap(String imageNamed) {
-		super(imageNamed);
-		loadMapFromXML("level1.tmx");
+	private void loadBackgrounds() {
+		String levelName = this.levelBackgrounds[currentLevel - 1];
+		//String levelName = "city";
+		int[] layerNum = numPerLayers[currentLevel - 1];
+		backgroundLayer1 = new LinkedList<Sprite>();
+		for (int i = 0; i < layerNum[0]; i++) {
+			Sprite background1 = new Sprite("images/" + levelName + "1-" + (i + 1) + ".png");
+			GameScene gameScene = (GameScene)this.scene;
+			background1.position = new Vector2D(gameScene.gameWidth() / 2 + gameScene.gameWidth() * i, gameScene.gameHeight() / 2 - 100);
+			backgroundLayer1.add(background1);
+		}
+		backgroundLayer2 = new LinkedList<Sprite>();
+		for (int i = 0; i < layerNum[1]; i++) {
+			Sprite background1 = new Sprite("images/" + levelName + "2-" + (i + 1) + ".png");
+			GameScene gameScene = (GameScene)this.scene;
+			background1.position = new Vector2D(gameScene.gameWidth() / 2 + gameScene.gameWidth() * i, gameScene.gameHeight() / 2 - 100);
+			backgroundLayer2.add(background1);
+		}
+		backgroundLayer3 = new LinkedList<Sprite>();
+		for (int i = 0; i < layerNum[2]; i++) {
+			Sprite background1 = new Sprite("images/" + levelName + "3-" + (i + 1) + ".png");
+			GameScene gameScene = (GameScene)this.scene;
+			background1.position = new Vector2D(gameScene.gameWidth() / 2 + gameScene.gameWidth() * i, gameScene.gameHeight() / 2 - 100);
+			backgroundLayer3.add(background1);
+		}
+		backgroundLayer4 = new LinkedList<Sprite>();
+		for (int i = 0; i < layerNum[3]; i++) {
+			Sprite background1 = new Sprite("images/" + levelName + "4-" + (i + 1) + ".png");
+			GameScene gameScene = (GameScene)this.scene;
+			background1.position = new Vector2D(gameScene.gameWidth() / 2 + gameScene.gameWidth() * i, gameScene.gameHeight() / 2 - 100);
+			backgroundLayer4.add(background1);
+		}
 	}
+	
+	
 
 	public TileMap(GameScene scene, int level) {
 		this.scene = scene;
+		this.currentLevel = level;
 		loadMapFromXML("level" + level + ".tmx");
-		System.out.println(children.size());
+		loadBackgrounds();
 	}
 
 	public void addChild(Sprite sprite) {
@@ -201,11 +244,36 @@ public class TileMap extends GameObject {
 		for (Sprite sprite: this.children) {
 			sprite.position = Vector2DHelper.SubstractVector(sprite.position, offset);
 		}
+		for (Sprite background: this.backgroundLayer1) {
+			background.position = Vector2DHelper.SubstractVector(background.position, Vector2DHelper.MutilByScalar(offset, 0.5));
+		}
+		for (Sprite background: this.backgroundLayer2) {
+			background.position = Vector2DHelper.SubstractVector(background.position, Vector2DHelper.MutilByScalar(offset, 0.3));
+		}
+		for (Sprite background: this.backgroundLayer3) {
+			background.position = Vector2DHelper.SubstractVector(background.position, Vector2DHelper.MutilByScalar(offset, 0.2));
+		}
+		for (Sprite background: this.backgroundLayer4) {
+			background.position = Vector2DHelper.SubstractVector(background.position, Vector2DHelper.MutilByScalar(offset, 0.1));
+		}
 		this.position = position;
 	}
 
 
 	public void render(GraphicsContext gc) {	
+		for (Sprite background: this.backgroundLayer4) {
+			background.render(gc);
+		}
+		for (Sprite background: this.backgroundLayer3) {
+			background.render(gc);
+		}
+		for (Sprite background: this.backgroundLayer2) {
+			background.render(gc);
+		}
+		for (Sprite background: this.backgroundLayer1) {
+			background.render(gc);
+		}
+		
 		for (int i = 0; i < mapWidth * mapHeight; i++) {
 			int gid = data[i];
 			if (gid == 0) continue;
@@ -222,6 +290,8 @@ public class TileMap extends GameObject {
 
 			gc.drawImage(tileset, sx, sy, 32, 32, dx, dy, tileWidth, tileHeight);
 		}
+		
+		
 
 	}
 

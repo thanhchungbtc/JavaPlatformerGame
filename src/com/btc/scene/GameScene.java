@@ -1,12 +1,15 @@
 package com.btc.scene;
 
+import java.io.File;
 import java.lang.reflect.Array;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.SynchronousQueue;
 
 import com.btc.Rect;
+import com.btc.SoundManager;
 import com.btc.Vector2D;
 import com.btc.config.Config;
 import com.btc.helper.CollisionsHelper;
@@ -32,11 +35,17 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javazoom.jlgui.basicplayer.BasicPlayer;
+import javazoom.jlgui.basicplayer.BasicPlayerException;
 
 public class GameScene extends Scene {
 	public Group root;
 	public Canvas canvas;
 
+	BasicPlayer playBackground;
 	long lastUpdateTime = 0;
 	TileMap map;
 	Player player;
@@ -52,11 +61,14 @@ public class GameScene extends Scene {
 	List<PowerUp> powerUps;
 	Vector2D exitPoint;
 	int currentLevel = 1;
+	
+	public boolean loose = false;
+	public boolean gameRunning = true;
 	public double gameHeight() {
 		return canvas.getHeight();
 	}
 
-	private double gameWidth() {
+	public double gameWidth() {
 		return canvas.getWidth();
 	}
 	private void setupGameLoop() {
@@ -111,32 +123,12 @@ public class GameScene extends Scene {
 //		player.isActive = true;
 //		player.position = new Vector2D(100, 300);
 		player = map.player;
+		player.setScene(this);
 		player.lifeBarImage = this.lifeBarImage;
 	}
 
 	private void loadEnemies() {
-//		enemies = new LinkedList<Enemy>();
-//		crawler = new Crawler("sprites/Crawler1.png");
-//		map.addChild(crawler);
-//		crawler.player = player;
-//		crawler.position = new Vector2D(800, 400);
-//		enemies.add(crawler);
-//
-//		meanCrawler = new MeanCrawler("sprites/MeanCrawler1.png");
-//		meanCrawler.player = player;
-//		meanCrawler.map = map;
-//		map.addChild(meanCrawler);
-//		meanCrawler.position = new Vector2D(500, 400);
-//		enemies.add(meanCrawler);
-//
-//		flyer = new Flyer("sprites/Flyer1.png");
-//		flyer.player = player;
-//		flyer.map = map;
-//		map.addChild(flyer);
-//		flyer.position = new Vector2D(500, 400);
-//		enemies.add(flyer);
 		this.enemies = map.enemies;
-		
 	}
 
 	private void checkForExit() {
@@ -149,7 +141,16 @@ public class GameScene extends Scene {
 	}
 	
 	private void newLevel() {
-		backgroundImage = new Image("images/city1-2.png");
+		
+		
+		try {			
+			
+			playBackground = new BasicPlayer();
+			playBackground.open(new File("sounds/lvl" + currentLevel + ".mp3").toURL());
+			SoundManager.playSound(playBackground);
+		} catch (BasicPlayerException | MalformedURLException e) {
+			e.printStackTrace();
+		}
 		map = new TileMap(this, currentLevel);
 		double gameHeight = this.gameHeight();
 		double diffHeight = map.mapHeightInPixel() - gameHeight;
@@ -295,6 +296,21 @@ public class GameScene extends Scene {
 		setupGameLoop();		
 		newLevel();
 	}
+	
+	public void looseGame() {
+		try {
+			playBackground.stop();
+			
+			gameRunning = false;
+			Text text = new Text(gameWidth() / 2 - 100, gameHeight() / 2, "YOU LOOSE");
+			text.setFont(Font.font("Chalkduster", FontWeight.BOLD, 50));
+			text.setFill(Color.WHITE);
+			root.getChildren().add(text);
+		} catch (BasicPlayerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	public void handleEvents(List<String> input) {
 		if (input.contains("LEFT"))
@@ -333,6 +349,8 @@ public class GameScene extends Scene {
 	}
 
 	public void update(long currentTime) {
+		if (!gameRunning) 
+			return;
 		checkForExit();
 		
 		double dt = (currentTime - lastUpdateTime) / Config.NANOSECONDPERSEC;
@@ -385,7 +403,7 @@ public class GameScene extends Scene {
 	public void render(GraphicsContext gc) {
 		// clear canvas
 		gc.clearRect(0, 0, Config.WindowProperties.WINDOW_WIDTH, Config.WindowProperties.WINDOW_HEIGHT);
-		gc.drawImage(backgroundImage, 0, 0);
+		
 		map.render(gc);
 		for (PowerUp powerUp: powerUps) {
 			powerUp.render(gc);
@@ -395,9 +413,10 @@ public class GameScene extends Scene {
 			enemy.render(gc);
 		lifeBarImage.render(gc);
 		
+		
 		// for debug purpose	
 		gc.setStroke(Color.AQUA);
-		gc.strokeText("FPS: " + String.valueOf(this.fps), this.getWidth() - 100, this.getHeight() - 30);
+		gc.strokeText("FPS: " + String.valueOf(this.fps), this.getWidth() - 80, this.getHeight() - 30);
 	}
 	// for debug
 	int fps;

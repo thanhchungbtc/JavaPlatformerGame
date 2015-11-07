@@ -1,22 +1,39 @@
 package com.btc.model;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 
 import com.btc.Rect;
+import com.btc.SoundManager;
 import com.btc.Vector2D;
 import com.btc.config.Config;
 import com.btc.helper.Utilities;
 import com.btc.helper.Vector2DHelper;
 import com.btc.model.Character.CharacterState;
-import com.sun.javafx.fxml.BeanAdapter;
+import com.btc.scene.GameScene;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import javazoom.jlgui.basicplayer.BasicPlayer;
+import javazoom.jlgui.basicplayer.BasicPlayerException;
 
 public class Player extends Character {
+	
+	// sound effect
+	BasicPlayer playJumpSound;
+	BasicPlayer playDyingSound;
+	BasicPlayer playBounceSound;
 	
 	public boolean shouldJump = false;
 	public boolean shouldMoveLeft = false;
@@ -49,9 +66,24 @@ public class Player extends Character {
 		this.changeState(CharacterState.STANDING);	
 	}
 	
+	
 	@Override
 	public void changeState(CharacterState newState) {
+		if (newState == characterState) return;
+		
+		switch (newState) {
+		case JUMP_UP:
+			SoundManager.playSound(playJumpSound);
+			break;
+		case DEAD:
+			SoundManager.playSound(playDyingSound);
+			break;
+	
+		default:
+			break;
+		}
 		super.changeState(newState);
+		
 	}
 	
 	@Override	
@@ -74,6 +106,7 @@ public class Player extends Character {
 		      this.velocity = new Vector2D(this.velocity.x, -Config.PlayerProperties.JumpForce);
 		      newState = CharacterState.JUMP_UP;
 		      this.onGround = false;
+		      
 		    } 
 		  } 
 		    
@@ -94,16 +127,30 @@ public class Player extends Character {
 	public Player(String imageNamed) {
 		super(imageNamed);	
 		life = 500;
+		
+		try {
+			playJumpSound = new BasicPlayer();
+			playJumpSound.open(new File("sounds/jump1.mp3").toURL());
+			playDyingSound = new BasicPlayer();
+			playDyingSound.open(new File("sounds/player_die.wav").toURL());
+			playBounceSound = new BasicPlayer();
+			playBounceSound.open(new File("sounds/bounce.wav").toURL());
+			
+		} catch (BasicPlayerException | MalformedURLException e) {
+			
+		}
 	}
 	
 	public Player() {
 		life = 500;
 	}
+	
 	@Override
 	public void tookHit(Character character) {
 		setLife(life - 50);
 		if (life <= 0) {
 			changeState(CharacterState.DEAD);
+			
 		} else {
 			isActive = false;
 			isInvulnerable = true;
@@ -115,7 +162,7 @@ public class Player extends Character {
 		}
 		
 	}
-	
+		
 	public void setLife(int newLife) {
 		if (newLife == life) {
 			return;
@@ -123,6 +170,7 @@ public class Player extends Character {
 		life = newLife;
 		int lifeIdx = (newLife + 50) / 100;
 				
+		lifeIdx =(int) Utilities.clamp((double)lifeIdx, 0, 5);
 		// set lifebar
 		try {
 			lifeBarImage.setTexture(new Image(new FileInputStream("sprites/Life_Bar_" + lifeIdx + "_5.png")));
@@ -143,7 +191,7 @@ public class Player extends Character {
 				engameTickCount++;
 				if (engameTickCount > 30) {
 					// end the game
-					System.out.println("end game");
+					endGame();
 				}
 			} 
 			return;
@@ -185,7 +233,13 @@ public class Player extends Character {
 		}
 	}
 	
+	public void endGame() {
+		GameScene gameScene = (GameScene)scene;
+		gameScene.looseGame();		
+	}
+	
 	public void bounce() {
 		this.velocity = new Vector2D(this.velocity.x, -Config.PlayerProperties.JumpForce / 3);		
+		SoundManager.playSound(playBounceSound);
 	}
 }

@@ -1,17 +1,26 @@
 package com.btc.model;
 
+import java.io.File;
+import java.net.MalformedURLException;
+
 import com.btc.Rect;
+import com.btc.SoundManager;
 import com.btc.Vector2D;
 import com.btc.scene.TileMap;
 
+import javazoom.jlgui.basicplayer.BasicPlayer;
+import javazoom.jlgui.basicplayer.BasicPlayerException;
+
 public class Enemy extends Character {
 
+	BasicPlayer playDyingSound;
 	public Player player;
 	public TileMap map;
 	
 	public Enemy(String imageNamed) {
 		super(imageNamed);
 		life = 100;
+		
 	}
 	
 	@Override

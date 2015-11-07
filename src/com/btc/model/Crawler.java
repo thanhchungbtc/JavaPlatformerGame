@@ -1,13 +1,19 @@
 package com.btc.model;
 
 
+import java.io.File;
+import java.net.MalformedURLException;
+
 import com.btc.Rect;
+import com.btc.SoundManager;
 import com.btc.Vector2D;
 import com.btc.config.Config;
 import com.btc.helper.Vector2DHelper;
 import com.btc.model.Character.CharacterState;
 
 import javafx.scene.image.Image;
+import javazoom.jlgui.basicplayer.BasicPlayer;
+import javazoom.jlgui.basicplayer.BasicPlayerException;
 
 public class Crawler extends Enemy {
 
@@ -23,7 +29,15 @@ public class Crawler extends Enemy {
 
 	@Override
 	public void changeState(CharacterState newState) {
-
+		if (newState == characterState) return;
+		switch (newState) {
+		case DEAD:
+			SoundManager.playSound(playDyingSound);
+			break;
+	
+		default:
+			break;
+		}
 		super.changeState(newState);
 	}
 
@@ -108,7 +122,12 @@ public class Crawler extends Enemy {
 
 	public Crawler(String imageNamed) {
 		super(imageNamed);
-		// TODO Auto-generated constructor stub
+		try {			
+			playDyingSound = new BasicPlayer();
+			playDyingSound.open(new File("sounds/crawler_die.wav").toURL());			
+		} catch (BasicPlayerException | MalformedURLException e) {
+			
+		}
 	}	
 	public Crawler() {
 		// TODO Auto-generated constructor stub
