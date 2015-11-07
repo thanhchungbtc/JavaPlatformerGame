@@ -11,6 +11,7 @@ import com.btc.helper.Vector2DHelper;
 import com.btc.model.GameObject;
 import com.btc.model.MeanCrawler;
 import com.btc.model.Player;
+import com.btc.model.PowerUp;
 import com.btc.model.Sprite;
 import com.btc.model.Character.CharacterState;
 import com.btc.model.Crawler;
@@ -35,8 +36,9 @@ public class TileMap extends GameObject {
 
 	List<Sprite> children = new ArrayList<Sprite>();
 	public List<Enemy> enemies;
+	public List<PowerUp> powerUps;
 	public Player player;
-
+	public Vector2D exitPoint;
 	private void loadMapFromXML(String fileName) {
 		try {
 			XmlElement root = Xmlwise.loadXml("levels/" + fileName);
@@ -64,11 +66,13 @@ public class TileMap extends GameObject {
 			
 			// load objects: enemies and player
 			enemies = new LinkedList<Enemy>();
+			powerUps = new LinkedList<PowerUp>();
 			LinkedList<XmlElement> objectGroups = root.get("objectgroup");
 			for (XmlElement objectGroup: objectGroups) {
 				// load objects: player, entrance, exit
 				if (objectGroup.getAttribute("name").equals("objects")) {
 					loadCharacterFromXmlElement(objectGroup.get("object"), "player");
+					loadCharacterFromXmlElement(objectGroup, "exit");
 				}
 				// load enemies
 				else if (objectGroup.getAttribute("name").equals("enemies")) {
@@ -78,7 +82,7 @@ public class TileMap extends GameObject {
 				}
 				// load powerups object
 				else if (objectGroup.getAttribute("name").equals("powerups")) {
-					
+					loadCharacterFromXmlElement(objectGroup, "Health");
 				}
 			}
 			
@@ -93,21 +97,36 @@ public class TileMap extends GameObject {
 			if (object.getAttribute("name").equals(name))
 			{
 				String type = object.getAttribute("type");
-				Character character = null;
+				GameObject gameObject = null;
 				switch (type) {
 				case "player":
-					character = new Player("sprites/Player1.png");	
-					character.isActive = true;	
-					this.player = (Player)character;
-					break;				
+					gameObject = new Player("sprites/Player1.png");	
+					Player player = (Player)gameObject;
+					
+					player.isActive = true;	
+					this.player = player;
+					break;	
+				case "Health":
+					gameObject = new PowerUp("sprites/Health.png");
+					PowerUp powerUp = (PowerUp)gameObject;
+					this.powerUps.add(powerUp);
+					break;
+				case "exit":
+					//double diff1 = mapHeight * tileHeight - ((GameScene)this.scene).gameHeight();
+					double exitX =  Double.valueOf(object.getAttribute("x").trim());
+					double exitY =  Double.valueOf(object.getAttribute("y").trim()) ;//- diff1;
+					exitPoint = new Vector2D(exitX, exitY);
+					
+					return;
+					
 				default:
-					if (type.equals("Crawler")) character = new Crawler("sprites/Crawler1.png");
-					else if (type.equals("MeanCrawler")) character = new MeanCrawler("sprites/MeanCrawler1.png");
-					else if (type.equals("Flyer")) character = new Flyer("sprites/Flyer1.png"); 
+					if (type.equals("Crawler")) gameObject = new Crawler("sprites/Crawler1.png");
+					else if (type.equals("MeanCrawler")) gameObject = new MeanCrawler("sprites/MeanCrawler1.png");
+					else if (type.equals("Flyer")) gameObject = new Flyer("sprites/Flyer1.png"); 
 					else {
-						character = new Crawler("sprites/Crawler1.png");
+						gameObject = new Crawler("sprites/Crawler1.png");
 					}
-					Enemy enemy = (Enemy)character;
+					Enemy enemy = (Enemy)gameObject;
 					enemy.player = this.player;
 					enemy.map = this;
 					enemy.isActive = false;
@@ -117,8 +136,8 @@ public class TileMap extends GameObject {
 				double diff = mapHeight * tileHeight - ((GameScene)this.scene).gameHeight();
 				double x =  Double.valueOf(object.getAttribute("x").trim());
 				double y =  Double.valueOf(object.getAttribute("y").trim()) - diff;
-				character.position = new Vector2D(x, y);
-				this.addChild(character);
+				gameObject.position = new Vector2D(x, y);
+				this.addChild(gameObject);
 			
 			}
 		}
@@ -129,9 +148,9 @@ public class TileMap extends GameObject {
 		loadMapFromXML("level1.tmx");
 	}
 
-	public TileMap(GameScene scene) {
+	public TileMap(GameScene scene, int level) {
 		this.scene = scene;
-		loadMapFromXML("level1.tmx");
+		loadMapFromXML("level" + level + ".tmx");
 		System.out.println(children.size());
 	}
 

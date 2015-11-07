@@ -1,5 +1,7 @@
 package com.btc.model;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 
 import com.btc.Rect;
@@ -99,11 +101,7 @@ public class Player extends Character {
 	}
 	@Override
 	public void tookHit(Character character) {
-		
-		life -= 100;
-		
-		// set lifebar
-		
+		setLife(life - 50);
 		if (life <= 0) {
 			changeState(CharacterState.DEAD);
 		} else {
@@ -116,6 +114,22 @@ public class Player extends Character {
 			}
 		}
 		
+	}
+	
+	public void setLife(int newLife) {
+		if (newLife == life) {
+			return;
+		}
+		life = newLife;
+		int lifeIdx = (newLife + 50) / 100;
+				
+		// set lifebar
+		try {
+			lifeBarImage.setTexture(new Image(new FileInputStream("sprites/Life_Bar_" + lifeIdx + "_5.png")));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	int invulnerableTickCount = 0;

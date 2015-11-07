@@ -10,9 +10,11 @@ import com.btc.Rect;
 import com.btc.Vector2D;
 import com.btc.config.Config;
 import com.btc.helper.CollisionsHelper;
+import com.btc.helper.Utilities;
 import com.btc.helper.Vector2DHelper;
 import com.btc.model.Character;
 import com.btc.model.Player;
+import com.btc.model.PowerUp;
 import com.btc.model.Sprite;
 import com.btc.model.Character.CharacterState;
 import com.btc.model.Crawler;
@@ -44,8 +46,12 @@ public class GameScene extends Scene {
 
 	List<Sprite> sprites;
 	Image backgroundImage;
+	Sprite lifeBarImage;
 
 	List<Enemy> enemies;
+	List<PowerUp> powerUps;
+	Vector2D exitPoint;
+	int currentLevel = 1;
 	public double gameHeight() {
 		return canvas.getHeight();
 	}
@@ -105,6 +111,7 @@ public class GameScene extends Scene {
 //		player.isActive = true;
 //		player.position = new Vector2D(100, 300);
 		player = map.player;
+		player.lifeBarImage = this.lifeBarImage;
 	}
 
 	private void loadEnemies() {
@@ -132,6 +139,33 @@ public class GameScene extends Scene {
 		
 	}
 
+	private void checkForExit() {
+		Vector2D playerPositionInMap = Vector2DHelper.SubstractVector(player.position, map.position); 
+		double distance = Vector2DHelper.DistanceBetweeen(playerPositionInMap, exitPoint);
+		if (distance < 100) { // level clear
+			currentLevel++;
+			newLevel();
+		}
+	}
+	
+	private void newLevel() {
+		backgroundImage = new Image("images/city1-2.png");
+		map = new TileMap(this, currentLevel);
+		double gameHeight = this.gameHeight();
+		double diffHeight = map.mapHeightInPixel() - gameHeight;
+		map.position = new Vector2D(0, -diffHeight);
+		lifeBarImage = new Sprite("sprites/Life_Bar_5_5.png");
+		lifeBarImage.position = new Vector2D(100, 50);
+		//sprites = new ArrayList<Sprite>();
+
+		setupPlayer();
+		loadEnemies();
+		powerUps = map.powerUps;
+		exitPoint = map.exitPoint;
+		System.out.println(exitPoint.x);
+		
+	}
+	
 	private void checkForEnemyCollisions(Enemy enemy) {
 		if (enemy.isActive && player.isActive && enemy.getState() != CharacterState.DEAD) {
 			if(CollisionsHelper.RectIntersectsRect(this.player.collisionBoundingBox(), enemy.collisionBoundingBox())) {
@@ -235,21 +269,31 @@ public class GameScene extends Scene {
 
 	}
 
+	private void checkForPowerUp() {
+		List<PowerUp> powerUpsToRemove = null;
+		for (PowerUp powerUp: this.powerUps) {
+			if (CollisionsHelper.RectIntersectsRect(powerUp.collisionBoundingBox(), player.collisionBoundingBox())) {
+				if (powerUpsToRemove == null) powerUpsToRemove = new LinkedList<PowerUp>();
+				
+				int playerLife = player.life + 50;
+				playerLife = (int) Utilities.clamp((double)playerLife, 0, 500);
+				player.setLife(playerLife);
+				powerUpsToRemove.add(powerUp);
+			}
+		}
+		if (powerUpsToRemove != null) {
+			for(PowerUp powerUp: powerUpsToRemove) {
+				this.powerUps.remove(powerUp);
+				this.map.removeChild(powerUp);
+				System.out.println(powerUps.size());
+			}
+		}
+	}	
+	
 	public GameScene() {
 		super(new Group());
 		setupGameLoop();		
-		backgroundImage = new Image("images/city1-2.png");
-		map = new TileMap(this);
-		double gameHeight = this.gameHeight();
-		double diffHeight = map.mapHeightInPixel() - gameHeight;
-		map.position = new Vector2D(0, -diffHeight);
-	
-
-		//sprites = new ArrayList<Sprite>();
-
-		setupPlayer();
-		loadEnemies();
-		
+		newLevel();
 	}
 
 	public void handleEvents(List<String> input) {
@@ -289,6 +333,8 @@ public class GameScene extends Scene {
 	}
 
 	public void update(long currentTime) {
+		checkForExit();
+		
 		double dt = (currentTime - lastUpdateTime) / Config.NANOSECONDPERSEC;
 		if (dt > 0.03) dt = 0.03;
 		lastUpdateTime = currentTime;
@@ -324,6 +370,7 @@ public class GameScene extends Scene {
 			}
 			enemiesToDelete.clear();
 		}
+		this.checkForPowerUp();
 
 		moveMapCenterPlayer(dt);
 		// for debug purpose
@@ -339,11 +386,15 @@ public class GameScene extends Scene {
 		// clear canvas
 		gc.clearRect(0, 0, Config.WindowProperties.WINDOW_WIDTH, Config.WindowProperties.WINDOW_HEIGHT);
 		gc.drawImage(backgroundImage, 0, 0);
-		
+		map.render(gc);
+		for (PowerUp powerUp: powerUps) {
+			powerUp.render(gc);
+		}
 		player.render(gc);
 		for (Enemy enemy: enemies) 
 			enemy.render(gc);
-		map.render(gc);
+		lifeBarImage.render(gc);
+		
 		// for debug purpose	
 		gc.setStroke(Color.AQUA);
 		gc.strokeText("FPS: " + String.valueOf(this.fps), this.getWidth() - 100, this.getHeight() - 30);
