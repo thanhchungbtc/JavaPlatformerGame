@@ -13,7 +13,7 @@ import xmlwise.Plist;
 
 public abstract class Character extends GameObject {
 	public enum CharacterState {
-		STANDING, WALKING, JUMP_UP, FALLING, DYING, DEAD
+		STANDING, WALKING, JUMP_UP, FALLING, DYING, DEAD, SEEKING, ATTACKING, HIDING
 	}
 	protected Map<CharacterState, AnimatedImage> frameDictionary;	
 	protected double timeElapsedSinceStartAnimation; // second	
@@ -23,7 +23,8 @@ public abstract class Character extends GameObject {
 		
 	protected boolean onGround = false;
 	protected boolean onWall = false;
-
+	
+	public boolean isActive = false;
 	public Vector2D desiredPosition;
 	public Vector2D velocity = Vector2D.zero;
 	
@@ -40,6 +41,10 @@ public abstract class Character extends GameObject {
 	}
 	
 	public boolean getOnWall() { return this.onWall; }
+	public void tookHit(Character character) {
+		
+		System.out.println("Took hit" + character.getClassName() + ", " + this.getClassName());
+	}
 	
 	public Rect collisionBoundingBox() {
 		return new Rect(desiredPosition.x - this.size.width / 2, desiredPosition.y - this.size.height / 2, this.size.width, this.size.height);
@@ -92,6 +97,10 @@ public abstract class Character extends GameObject {
 			exception.printStackTrace();
 		}
 		return null;
+	}
+	
+	protected AnimatedImage loadAnimations(String animationName, boolean repeat) {
+		return loadAnimations(this.getClassName(), animationName, repeat);
 	}
 	
 

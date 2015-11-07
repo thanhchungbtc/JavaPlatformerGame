@@ -19,6 +19,7 @@ import com.btc.model.Sprite;
 import com.btc.model.Character.CharacterState;
 import com.btc.model.Crawler;
 import com.btc.model.Enemy;
+import com.btc.model.Flyer;
 import com.btc.model.MeanCrawler;
 
 import javafx.animation.AnimationTimer;
@@ -41,6 +42,7 @@ public class GameScene extends Scene {
 	Player player;
 	Crawler crawler;
 	MeanCrawler meanCrawler;
+	Flyer flyer;
 
 	List<Sprite> sprites;
 	Image backgroundImage;
@@ -102,6 +104,7 @@ public class GameScene extends Scene {
 	private void setupPlayer() {
 		player = new Player("/sprites/Player1.png");
 		map.addChild(player);
+		player.isActive = true;
 		player.position = new Vector2D(100, 300);
 	}
 	
@@ -119,6 +122,26 @@ public class GameScene extends Scene {
 		map.addChild(meanCrawler);
 		meanCrawler.position = new Vector2D(500, 400);
 		enemies.add(meanCrawler);
+		
+		flyer = new Flyer("sprites/Flyer1.png");
+		flyer.player = player;
+		flyer.map = map;
+		map.addChild(flyer);
+		flyer.position = new Vector2D(500, 400);
+		enemies.add(flyer);
+	}
+	
+	private void checkForEnemyCollisions(Enemy enemy) {
+		if (enemy.isActive && player.isActive) {
+			if(CollisionsHelper.RectIntersectsRect(this.player.collisionBoundingBox(), enemy.collisionBoundingBox())) {
+				Vector2D playerFootPoint = new Vector2D(player.position.x, player.position.y + player.collisionBoundingBox().height / 2);
+				if (this.player.velocity.y > 0 && playerFootPoint.y < enemy.position.y) {
+					enemy.tookHit(player);
+				} else {
+					player.tookHit(enemy);
+				}
+			}
+		}
 	}
 	
 	private void checkAndResolveCollision(Character character) {
@@ -273,6 +296,7 @@ public class GameScene extends Scene {
 		for (Enemy enemy: enemies) {
 			enemy.update(dt);
 			this.checkAndResolveCollision(enemy);
+			this.checkForEnemyCollisions(enemy);
 		}		
 		
 		 moveMapCenterPlayer(dt);

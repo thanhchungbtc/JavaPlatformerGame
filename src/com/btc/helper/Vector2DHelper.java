@@ -24,4 +24,9 @@ public class Vector2DHelper {
 		double b = vector2.y - vector1.y;
 		return Math.sqrt(a * a + b * b);
 	}
+	
+	public static Vector2D normalized(Vector2D vector) {
+		double length = vector.length();
+		return new Vector2D(vector.x / length, vector.y / length);
+	}
 }

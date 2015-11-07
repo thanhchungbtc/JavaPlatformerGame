@@ -25,7 +25,10 @@ public class Sprite {
 	protected Image image;
 
 	public TileMap map;
-	
+
+	protected String getClassName() {
+		return this.getClass().getSimpleName();
+	}
 	
 	public void setScene(Scene scene) {
 		this.scene = scene;

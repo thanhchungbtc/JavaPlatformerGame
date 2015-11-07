@@ -10,6 +10,10 @@ public class Vector2D {
 		this.y = y;
 	}
 	
+	public double length() {
+		return Math.sqrt(this.x * this.x + this.y * this.y);
+	}
+	
 	public final static Vector2D zero = new Vector2D(0, 0);
 }
 

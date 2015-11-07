@@ -37,10 +37,10 @@ public class Player extends Character {
 	
 	@Override
 	public void loadAnimations() {
-		frameDictionary.put(CharacterState.STANDING, this.loadAnimations("Player", "standingAnim", true));
-		frameDictionary.put(CharacterState.WALKING, this.loadAnimations("Player", "walkingAnim", true));
-		frameDictionary.put(CharacterState.JUMP_UP, this.loadAnimations("Player", "jumpUpAnim", false));
-		frameDictionary.put(CharacterState.FALLING, this.loadAnimations("Player", "fallingAnim", false));		
+		frameDictionary.put(CharacterState.STANDING, this.loadAnimations("standingAnim", true));
+		frameDictionary.put(CharacterState.WALKING, this.loadAnimations("walkingAnim", true));
+		frameDictionary.put(CharacterState.JUMP_UP, this.loadAnimations("jumpUpAnim", false));
+		frameDictionary.put(CharacterState.FALLING, this.loadAnimations("fallingAnim", false));		
 		this.changeState(CharacterState.STANDING);	
 	}
 	

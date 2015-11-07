@@ -30,5 +30,12 @@
 		<key>delay</key>
 		<real>0.15</real>
 	</dict>
+	<key>hidingAnim</key>
+	<dict>
+		<key>animationFrames</key>
+		<string>4</string>
+		<key>delay</key>
+		<integer>1</integer>
+	</dict>
 </dict>
 </plist>

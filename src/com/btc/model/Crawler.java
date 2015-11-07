@@ -13,10 +13,10 @@ public class Crawler extends Enemy {
 
 	@Override
 	public void loadAnimations() {
-		frameDictionary.put(CharacterState.WALKING, this.loadAnimations("Crawler", "walkingAnim", true));
-		frameDictionary.put(CharacterState.JUMP_UP, this.loadAnimations("Crawler", "jumpUpAnim", false));
-		frameDictionary.put(CharacterState.DYING, this.loadAnimations("Crawler", "dyingAnim", false));
-		frameDictionary.put(CharacterState.FALLING, this.loadAnimations("Crawler", "fallingAnim", false));
+		frameDictionary.put(CharacterState.WALKING, this.loadAnimations("walkingAnim", true));
+		frameDictionary.put(CharacterState.JUMP_UP, this.loadAnimations("jumpUpAnim", false));
+		frameDictionary.put(CharacterState.DYING, this.loadAnimations("dyingAnim", false));
+		frameDictionary.put(CharacterState.FALLING, this.loadAnimations("fallingAnim", false));
 		
 		this.changeState(CharacterState.WALKING);
 	}
@@ -74,8 +74,10 @@ public class Crawler extends Enemy {
 		Double distance = Vector2DHelper.DistanceBetweeen(this.position, player.position);
 		if (distance > 1000) {
 			this.desiredPosition = this.position;
-			return;
-		}
+			this.isActive = false;
+			return; 
+		} else 
+			this.isActive = true;
 		
 		// logic comes here
 		updateState(dt);
