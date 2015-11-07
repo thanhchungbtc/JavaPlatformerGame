@@ -28,4 +28,8 @@ public class AnimatedImage {
 		int index = (int)( elapsed / duration);		
         return frames[index];
 	}
+	
+	public boolean animationCompleted(double elapsedTime) {
+		return elapsedTime > frames.length * duration;
+	}
 }

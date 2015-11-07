@@ -40,7 +40,7 @@
 	<key>dyingAnim</key>
 	<dict>
 		<key>animationFrames</key>
-		<string>16,17,18,19,20</string>
+		<string>32,33,34,35</string>
 		<key>delay</key>
 		<real>0.1</real>
 	</dict>

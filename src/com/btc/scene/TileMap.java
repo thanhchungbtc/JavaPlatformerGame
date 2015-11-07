@@ -31,6 +31,10 @@ public class TileMap extends GameObject {
 
 	}
 	
+	public void removeChild(Sprite sprite) {
+		children.remove(sprite);
+	}
+	
 	public boolean hasWallAtTileCoord(Vector2D tileCoord) {
 		int index = (int)tileCoord.y * this.mapWidth + (int)tileCoord.x;
 		return this.data[index] > 0;
@@ -97,9 +101,6 @@ public class TileMap extends GameObject {
 			gc.drawImage(tileset, sx, sy, 32, 32, dx, dy, tileWidth, tileHeight);
 		}
 		
-		for (Sprite sprite : this.children) {
-			sprite.render(gc);
-		}
 	}
 	
 	public static int[] data = {

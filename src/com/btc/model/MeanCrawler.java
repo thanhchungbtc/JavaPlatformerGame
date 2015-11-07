@@ -16,12 +16,20 @@ public class MeanCrawler extends Enemy {
 	public void loadAnimations() {
 		frameDictionary.put(CharacterState.WALKING, this.loadAnimations("walkingAnim", true));
 		frameDictionary.put(CharacterState.JUMP_UP, this.loadAnimations("jumpUpAnim", false));
+		frameDictionary.put(CharacterState.DEAD, this.loadAnimations("dyingAnim", false));
 		this.changeState(CharacterState.WALKING);
 	}
 
 	@Override
 	public void update(double dt) {		
-		
+		if (characterState == CharacterState.DEAD) {
+			// update animation only
+			super.update(dt);	
+			if (animation.animationCompleted(this.timeElapsedSinceStartAnimation)){
+				remove();			
+			} 
+			return;
+		}
 		Double distance = Vector2DHelper.DistanceBetweeen(this.position, player.position);
 		if (distance > 1000) {
 			this.desiredPosition = this.position;
@@ -64,4 +72,6 @@ public class MeanCrawler extends Enemy {
 		
 		super.update(dt);
 	}
+	
+	
 }

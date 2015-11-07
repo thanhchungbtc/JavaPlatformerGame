@@ -19,7 +19,7 @@ public class Player extends Character {
 	public boolean shouldJump = false;
 	public boolean shouldMoveLeft = false;
 	public boolean shouldMoveRight = false;
-	
+	private boolean isInvulnerable = false;
 	@Override
 	public void setTexture(Image newImage) {
 		// TODO Auto-generated method stub
@@ -40,7 +40,8 @@ public class Player extends Character {
 		frameDictionary.put(CharacterState.STANDING, this.loadAnimations("standingAnim", true));
 		frameDictionary.put(CharacterState.WALKING, this.loadAnimations("walkingAnim", true));
 		frameDictionary.put(CharacterState.JUMP_UP, this.loadAnimations("jumpUpAnim", false));
-		frameDictionary.put(CharacterState.FALLING, this.loadAnimations("fallingAnim", false));		
+		frameDictionary.put(CharacterState.FALLING, this.loadAnimations("fallingAnim", false));	
+		frameDictionary.put(CharacterState.DEAD, this.loadAnimations("dyingAnim", false));	
 		this.changeState(CharacterState.STANDING);	
 	}
 	
@@ -87,12 +88,61 @@ public class Player extends Character {
 	}
 	
 	public Player(String imageNamed) {
-		super(imageNamed);		
+		super(imageNamed);	
+		life = 500;
 	}
 	
 	@Override
+	public void tookHit(Character character) {
+		life -= 100;
+		if (life <= 0) {
+			changeState(CharacterState.DEAD);
+		} else {
+			isActive = false;
+			isInvulnerable = true;
+			if (this.position.x < character.position.x) {
+				this.velocity = new Vector2D(-80, -80);
+			} else {
+				this.velocity = new Vector2D(80, -80);
+			}
+		}
+		
+	}
+	
+	int invulnerableTickCount = 0;
+	int engameTickCount = 0;
+	@Override
 	public void update(double dt) {
+		if (characterState == CharacterState.DEAD) {
+			// update animation only
+			super.update(dt);	
+			if (animation.animationCompleted(this.timeElapsedSinceStartAnimation)){
+				engameTickCount++;
+				if (engameTickCount > 30) {
+					// end the game
+					System.out.println("end game");
+				}
+			} 
+			return;
+		}
+		
 		// logic comes here
+		if (isInvulnerable) {
+			invulnerableTickCount++;
+			if (invulnerableTickCount > 100) {
+				invulnerableTickCount = 0;
+				isActive = true;
+				isInvulnerable = false;
+			}
+		}
+		if (bouncing) {
+			bouncingTickcount++;
+			if (bouncingTickcount > 30){
+				isActive = true;
+				bouncing = false;
+				bouncingTickcount = 0;
+			}
+		}
 		updateState(dt);
 		
 		Vector2D gravity = Config.Gravity;
@@ -110,4 +160,22 @@ public class Player extends Character {
 		super.update(dt);
 	}
 	
+	@Override
+	public void render(GraphicsContext gc) {
+		if (isInvulnerable) {
+			gc.setGlobalAlpha(0.5);
+			super.render(gc);
+			gc.setGlobalAlpha(1.0);
+		} else {
+			super.render(gc);
+		}
+	}
+	
+	boolean bouncing = false;
+	int bouncingTickcount = 0;
+	public void bounce() {
+		this.velocity = new Vector2D(this.velocity.x, -Config.PlayerProperties.JumpForce / 3);
+		this.isActive = false;
+		bouncing = true;
+	}
 }

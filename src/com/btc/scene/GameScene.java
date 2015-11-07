@@ -1,7 +1,5 @@
 package com.btc.scene;
 
-/* lam den phan chuyen doi toa do player sang toa do map */
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -46,12 +44,12 @@ public class GameScene extends Scene {
 
 	List<Sprite> sprites;
 	Image backgroundImage;
-	
+
 	List<Enemy> enemies;
 	private double gameHeight() {
 		return canvas.getHeight();
 	}
-	
+
 	private double gameWidth() {
 		return canvas.getWidth();
 	}
@@ -59,31 +57,31 @@ public class GameScene extends Scene {
 		this.root = (Group) super.getRoot();
 		this.canvas = new Canvas(Config.WindowProperties.WINDOW_WIDTH, Config.WindowProperties.WINDOW_HEIGHT);
 		root.getChildren().add(canvas);
-		
+
 		ArrayList<String> input = new ArrayList<String>();
 		this.setOnKeyPressed(
-	            new EventHandler<KeyEvent>()
-	            {
-	                public void handle(KeyEvent e)
-	                {
-	                    String code = e.getCode().toString();
-	                    
-	                    // only add once... prevent duplicates
-	                    if ( !input.contains(code) )
-	                        input.add( code );
-	                }
-	            });
-	 
+				new EventHandler<KeyEvent>()
+				{
+					public void handle(KeyEvent e)
+					{
+						String code = e.getCode().toString();
+
+						// only add once... prevent duplicates
+						if ( !input.contains(code) )
+							input.add( code );
+					}
+				});
+
 		this.setOnKeyReleased(
-	            new EventHandler<KeyEvent>()
-	            {
-	                public void handle(KeyEvent e)
-	                {
-	                    String code = e.getCode().toString();
-	                    input.remove( code );
-	                }
-	            });
-	        
+				new EventHandler<KeyEvent>()
+				{
+					public void handle(KeyEvent e)
+					{
+						String code = e.getCode().toString();
+						input.remove( code );
+					}
+				});
+
 		new AnimationTimer() {
 
 			@Override
@@ -107,7 +105,7 @@ public class GameScene extends Scene {
 		player.isActive = true;
 		player.position = new Vector2D(100, 300);
 	}
-	
+
 	private void loadEnemies() {
 		enemies = new LinkedList<Enemy>();
 		crawler = new Crawler("sprites/Crawler1.png");
@@ -115,14 +113,14 @@ public class GameScene extends Scene {
 		crawler.player = player;
 		crawler.position = new Vector2D(800, 400);
 		enemies.add(crawler);
-		
+
 		meanCrawler = new MeanCrawler("sprites/MeanCrawler1.png");
 		meanCrawler.player = player;
 		meanCrawler.map = map;
 		map.addChild(meanCrawler);
 		meanCrawler.position = new Vector2D(500, 400);
 		enemies.add(meanCrawler);
-		
+
 		flyer = new Flyer("sprites/Flyer1.png");
 		flyer.player = player;
 		flyer.map = map;
@@ -130,64 +128,65 @@ public class GameScene extends Scene {
 		flyer.position = new Vector2D(500, 400);
 		enemies.add(flyer);
 	}
-	
+
 	private void checkForEnemyCollisions(Enemy enemy) {
-		if (enemy.isActive && player.isActive) {
+		if (enemy.isActive && player.isActive && enemy.getState() != CharacterState.DEAD) {
 			if(CollisionsHelper.RectIntersectsRect(this.player.collisionBoundingBox(), enemy.collisionBoundingBox())) {
 				Vector2D playerFootPoint = new Vector2D(player.position.x, player.position.y + player.collisionBoundingBox().height / 2);
 				if (this.player.velocity.y > 0 && playerFootPoint.y < enemy.position.y) {
 					enemy.tookHit(player);
+					player.bounce();
 				} else {
 					player.tookHit(enemy);
 				}
 			}
 		}
 	}
-	
+
 	private void checkAndResolveCollision(Character character) {
-			
+
 		character.setOnGround(false);
 		character.setOnWall(false);
-		
+
 		int[] indices = {7, 1, 3, 5, 0, 2, 6, 8 };
 		for (int i = 0; i < indices.length; i++) 
 		{
 			int tileIndex = indices[i];
 			// calculate player's position relative to map
 			Vector2D characterPosition = Vector2DHelper.SubstractVector(character.desiredPosition, map.position);
-			
+
 			Vector2D characterCoord = map.coordForPoint(characterPosition);
-			
-			
+
+
 			int tileColumn = tileIndex % 3;
 			int tileRow = tileIndex / 3;
 			Vector2D tileCoord = new Vector2D((int)characterCoord.x + tileColumn - 1, (int)characterCoord.y + tileRow - 1);
-			
+
 			int gid = map.tileGIDAtTileCoord(tileCoord);
 			if (gid == 0) continue;
 			Rect characterRect = character.collisionBoundingBox();
 			characterRect = new Rect(characterRect.x - map.position.x, characterRect.y - map.position.y,
 					characterRect.width, characterRect.height);
 			Rect tileRect = map.rectFromCoord(tileCoord);
-		
+
 			if (CollisionsHelper.RectIntersectsRect(characterRect, tileRect)) {
 				Rect intersection = CollisionsHelper.RectIntersection(characterRect, tileRect);
 				if (tileIndex == 7) {
 					character.desiredPosition = new Vector2D(character.desiredPosition.x, character.desiredPosition.y - intersection.height);
-					
+
 					character.setOnGround(true);
-					
+
 				} else if (tileIndex == 1) {
 					character.desiredPosition = new Vector2D(character.desiredPosition.x, character.desiredPosition.y + intersection.height);
 					character.velocity = new Vector2D(character.velocity.x, 0);
-					
+
 				} else if (tileIndex == 3) {
 					character.desiredPosition = new Vector2D(character.desiredPosition.x + intersection.width, character.desiredPosition.y);
 					character.setOnWall(true);
 				} else if (tileIndex == 5) {
 					character.desiredPosition = new Vector2D(character.desiredPosition.x - intersection.width, character.desiredPosition.y);
 					character.setOnWall(true);
-					
+
 				} else 
 				{
 					if (intersection.width > intersection.height)
@@ -206,31 +205,31 @@ public class GameScene extends Scene {
 						}
 						character.desiredPosition = new Vector2D(character.desiredPosition.x, character.desiredPosition.y + resolutionHeight);
 					} else {
-			              //tile is diagonal, but resolving horizontally
-			              double resolutionWidth = 0;
-			              if (tileIndex == 6 || tileIndex == 0) {
-			                resolutionWidth = intersection.width;
-			              } else {
-			                resolutionWidth = -intersection.width;
-			              }
-			              character.desiredPosition = new Vector2D(character.desiredPosition.x + resolutionWidth, character.desiredPosition.y);
-			              if (tileIndex == 6 || tileIndex == 8) {
-			                character.setOnWall(true);
-			              }
-			              character.velocity = new Vector2D(0.0, character.velocity.y);
-			            }
+						//tile is diagonal, but resolving horizontally
+						double resolutionWidth = 0;
+						if (tileIndex == 6 || tileIndex == 0) {
+							resolutionWidth = intersection.width;
+						} else {
+							resolutionWidth = -intersection.width;
+						}
+						character.desiredPosition = new Vector2D(character.desiredPosition.x + resolutionWidth, character.desiredPosition.y);
+						if (tileIndex == 6 || tileIndex == 8) {
+							character.setOnWall(true);
+						}
+						character.velocity = new Vector2D(0.0, character.velocity.y);
+					}
 
 				}
-				
+
 			}
-			
+
 		}
 		character.position = character.desiredPosition; 
-//		if (player.desiredPosition.y + player.size.height / 2 > gameHeight()) {
-//			player.desiredPosition =new Vector2D(player.desiredPosition.x, gameHeight() - player.size.height / 2);
-//			player.setOnGround(true);
-//		}
-		
+		//		if (player.desiredPosition.y + player.size.height / 2 > gameHeight()) {
+		//			player.desiredPosition =new Vector2D(player.desiredPosition.x, gameHeight() - player.size.height / 2);
+		//			player.setOnGround(true);
+		//		}
+
 	}
 
 	public GameScene() {
@@ -242,13 +241,13 @@ public class GameScene extends Scene {
 		double diffHeight = map.mapHeightInPixel() - gameHeight;
 		map.position = new Vector2D(0, -diffHeight);
 		map.setScene(this);
-		
+
 		sprites = new ArrayList<Sprite>();
 
 		setupPlayer();
 		loadEnemies();
 	}
-	
+
 	public void handleEvents(List<String> input) {
 		if (input.contains("LEFT"))
 			this.player.shouldMoveLeft = true;
@@ -258,31 +257,31 @@ public class GameScene extends Scene {
 			this.player.shouldMoveLeft = false;
 			this.player.shouldMoveRight = false;
 		}
-		
+
 		if (input.contains("SPACE"))
 			this.player.shouldJump = true;
 		else {
 			this.player.shouldJump = false;
 		}
 	}			
-	
+
 	private void moveMapCenterPlayer(double dt) {
 		Vector2D locationInMap = Vector2DHelper.SubstractVector(player.position, map.position);
 		if (locationInMap.x > gameWidth() / 2 && locationInMap.x < map.mapWidthInPixel() - gameWidth() / 2) {
-			
+
 			Vector2D centerOfView = new Vector2D(gameWidth() / 2, gameHeight() / 2);
 			double distanceToCenter = player.position.x - centerOfView.x;
 			map.setPosition(new Vector2D(map.position.x - distanceToCenter, map.position.y));
 			//player.position = new Vector2D(player.position.x - distanceToCenter, player.position.y);
 		} 
 		if (locationInMap.y > gameHeight() / 2 && locationInMap.y < map.mapHeightInPixel() - gameHeight() / 2) {
-			
+
 			Vector2D centerOfView = new Vector2D(gameWidth() / 2, gameHeight() / 2);
 			double distanceToCenter = player.position.y - centerOfView.y;
 			map.setPosition(new Vector2D(map.position.x, map.position.y - distanceToCenter));
 			//player.position = new Vector2D(player.position.x, player.position.y - distanceToCenter);
 		} 
-		
+
 	}
 
 	public void update(long currentTime) {
@@ -292,14 +291,37 @@ public class GameScene extends Scene {
 
 		player.update(dt);		
 		this.checkAndResolveCollision(player);
-		
+
+		List<Enemy> enemiesToDelete = null;
+
 		for (Enemy enemy: enemies) {
+
 			enemy.update(dt);
-			this.checkAndResolveCollision(enemy);
-			this.checkForEnemyCollisions(enemy);
+			if (enemy.isActive) {
+				this.checkAndResolveCollision(enemy);
+				this.checkForEnemyCollisions(enemy);
+			}
+			
+			if (!enemy.isActive 
+					&& enemy.getState() == CharacterState.DEAD) {
+				if (enemiesToDelete == null) {
+					enemiesToDelete = new ArrayList<Enemy>();
+					
+				}
+				enemiesToDelete.add(enemy);
+			}
 		}		
-		
-		 moveMapCenterPlayer(dt);
+		if (enemiesToDelete != null) {
+			for (Enemy enemy: enemiesToDelete) {
+				enemies.remove(enemy);
+				
+				enemy.remove();
+			}
+			enemiesToDelete.clear();
+		}
+
+		System.out.println(enemies.size());
+		moveMapCenterPlayer(dt);
 		// for debug purpose
 		if (debugInterval >= 30) {
 			debugInterval = 0;
@@ -314,9 +336,11 @@ public class GameScene extends Scene {
 		gc.clearRect(0, 0, Config.WindowProperties.WINDOW_WIDTH, Config.WindowProperties.WINDOW_HEIGHT);
 		// gc.fillRect(0, 0, Config.WindowProperties.WINDOW_WIDTH, Config.WindowProperties.WINDOW_HEIGHT);
 		gc.drawImage(backgroundImage, 0, 0);
-		
-		map.render(gc);
 
+		player.render(gc);
+		for (Enemy enemy: enemies) 
+			enemy.render(gc);
+		map.render(gc);
 		// for debug purpose	
 		gc.setStroke(Color.AQUA);
 		gc.strokeText("FPS: " + String.valueOf(this.fps), this.getWidth() - 100, this.getHeight() - 30);

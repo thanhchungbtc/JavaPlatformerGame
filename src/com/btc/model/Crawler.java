@@ -15,7 +15,7 @@ public class Crawler extends Enemy {
 	public void loadAnimations() {
 		frameDictionary.put(CharacterState.WALKING, this.loadAnimations("walkingAnim", true));
 		frameDictionary.put(CharacterState.JUMP_UP, this.loadAnimations("jumpUpAnim", false));
-		frameDictionary.put(CharacterState.DYING, this.loadAnimations("dyingAnim", false));
+		frameDictionary.put(CharacterState.DEAD, this.loadAnimations("dyingAnim", false));
 		frameDictionary.put(CharacterState.FALLING, this.loadAnimations("fallingAnim", false));
 		
 		this.changeState(CharacterState.WALKING);
@@ -71,6 +71,14 @@ public class Crawler extends Enemy {
 	
 	@Override
 	public void update(double dt) {
+		if (characterState == CharacterState.DEAD) {
+			// update animation only
+			super.update(dt);	
+			if (animation.animationCompleted(this.timeElapsedSinceStartAnimation)){
+				remove();			
+			} 
+			return;
+		}
 		Double distance = Vector2DHelper.DistanceBetweeen(this.position, player.position);
 		if (distance > 1000) {
 			this.desiredPosition = this.position;

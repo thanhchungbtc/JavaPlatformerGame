@@ -18,13 +18,20 @@ public class Flyer extends Enemy {
 		frameDictionary.put(CharacterState.SEEKING, this.loadAnimations("seekingAnim", true));
 		frameDictionary.put(CharacterState.ATTACKING, this.loadAnimations("attackingAnim", true));
 		frameDictionary.put(CharacterState.HIDING, this.loadAnimations("hidingAnim", true));
-		
+		frameDictionary.put(CharacterState.DEAD, this.loadAnimations("dyingAnim", false));
 		this.changeState(CharacterState.SEEKING);
 	}
 	
 	@Override
 	public void update(double dt) {
-		
+		if (characterState == CharacterState.DEAD) {
+			// update animation only
+			super.update(dt);	
+			if (animation.animationCompleted(this.timeElapsedSinceStartAnimation)){
+				remove();			
+			} 
+			return;
+		}
 		Double distance = Vector2DHelper.DistanceBetweeen(this.position, player.position);
 		if (distance > 1000) {
 			this.desiredPosition = this.position;
