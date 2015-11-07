@@ -18,17 +18,9 @@ public class MeanCrawler extends Enemy {
 		frameDictionary.put(CharacterState.JUMP_UP, this.loadAnimations("MeanCrawler", "jumpUpAnim", false));
 		this.changeState(CharacterState.WALKING);
 	}
-	
-	@Override
-	protected void updateState(double dt) {
-		
-		
-		
-	}
 
 	@Override
-	public void update(double dt) {
-		
+	public void update(double dt) {		
 		
 		Double distance = Vector2DHelper.DistanceBetweeen(this.position, player.position);
 		if (distance > 1000) {
