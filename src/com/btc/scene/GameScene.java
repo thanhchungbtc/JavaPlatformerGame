@@ -46,7 +46,7 @@ public class GameScene extends Scene {
 	Image backgroundImage;
 
 	List<Enemy> enemies;
-	private double gameHeight() {
+	public double gameHeight() {
 		return canvas.getHeight();
 	}
 
@@ -100,33 +100,36 @@ public class GameScene extends Scene {
 	}
 
 	private void setupPlayer() {
-		player = new Player("/sprites/Player1.png");
-		map.addChild(player);
-		player.isActive = true;
-		player.position = new Vector2D(100, 300);
+//		player = new Player("/sprites/Player1.png");
+//		map.addChild(player);
+//		player.isActive = true;
+//		player.position = new Vector2D(100, 300);
+		player = map.player;
 	}
 
 	private void loadEnemies() {
-		enemies = new LinkedList<Enemy>();
-		crawler = new Crawler("sprites/Crawler1.png");
-		map.addChild(crawler);
-		crawler.player = player;
-		crawler.position = new Vector2D(800, 400);
-		enemies.add(crawler);
-
-		meanCrawler = new MeanCrawler("sprites/MeanCrawler1.png");
-		meanCrawler.player = player;
-		meanCrawler.map = map;
-		map.addChild(meanCrawler);
-		meanCrawler.position = new Vector2D(500, 400);
-		enemies.add(meanCrawler);
-
-		flyer = new Flyer("sprites/Flyer1.png");
-		flyer.player = player;
-		flyer.map = map;
-		map.addChild(flyer);
-		flyer.position = new Vector2D(500, 400);
-		enemies.add(flyer);
+//		enemies = new LinkedList<Enemy>();
+//		crawler = new Crawler("sprites/Crawler1.png");
+//		map.addChild(crawler);
+//		crawler.player = player;
+//		crawler.position = new Vector2D(800, 400);
+//		enemies.add(crawler);
+//
+//		meanCrawler = new MeanCrawler("sprites/MeanCrawler1.png");
+//		meanCrawler.player = player;
+//		meanCrawler.map = map;
+//		map.addChild(meanCrawler);
+//		meanCrawler.position = new Vector2D(500, 400);
+//		enemies.add(meanCrawler);
+//
+//		flyer = new Flyer("sprites/Flyer1.png");
+//		flyer.player = player;
+//		flyer.map = map;
+//		map.addChild(flyer);
+//		flyer.position = new Vector2D(500, 400);
+//		enemies.add(flyer);
+		this.enemies = map.enemies;
+		
 	}
 
 	private void checkForEnemyCollisions(Enemy enemy) {
@@ -236,16 +239,17 @@ public class GameScene extends Scene {
 		super(new Group());
 		setupGameLoop();		
 		backgroundImage = new Image("images/city1-2.png");
-		map = new TileMap();
+		map = new TileMap(this);
 		double gameHeight = this.gameHeight();
 		double diffHeight = map.mapHeightInPixel() - gameHeight;
 		map.position = new Vector2D(0, -diffHeight);
-		map.setScene(this);
+	
 
-		sprites = new ArrayList<Sprite>();
+		//sprites = new ArrayList<Sprite>();
 
 		setupPlayer();
 		loadEnemies();
+		
 	}
 
 	public void handleEvents(List<String> input) {
@@ -312,15 +316,15 @@ public class GameScene extends Scene {
 			}
 		}		
 		if (enemiesToDelete != null) {
+			System.out.println(enemiesToDelete.size());
 			for (Enemy enemy: enemiesToDelete) {
 				enemies.remove(enemy);
-				
+				map.removeChild(enemy);
 				enemy.remove();
 			}
 			enemiesToDelete.clear();
 		}
 
-		System.out.println(enemies.size());
 		moveMapCenterPlayer(dt);
 		// for debug purpose
 		if (debugInterval >= 30) {
@@ -334,9 +338,8 @@ public class GameScene extends Scene {
 	public void render(GraphicsContext gc) {
 		// clear canvas
 		gc.clearRect(0, 0, Config.WindowProperties.WINDOW_WIDTH, Config.WindowProperties.WINDOW_HEIGHT);
-		// gc.fillRect(0, 0, Config.WindowProperties.WINDOW_WIDTH, Config.WindowProperties.WINDOW_HEIGHT);
 		gc.drawImage(backgroundImage, 0, 0);
-
+		
 		player.render(gc);
 		for (Enemy enemy: enemies) 
 			enemy.render(gc);

@@ -24,6 +24,7 @@ public class MeanCrawler extends Enemy {
 	public void update(double dt) {		
 		if (characterState == CharacterState.DEAD) {
 			// update animation only
+			this.desiredPosition = this.position;
 			super.update(dt);	
 			if (animation.animationCompleted(this.timeElapsedSinceStartAnimation)){
 				remove();			
@@ -73,5 +74,7 @@ public class MeanCrawler extends Enemy {
 		super.update(dt);
 	}
 	
-	
+	public MeanCrawler() {
+		// TODO Auto-generated constructor stub
+	}
 }

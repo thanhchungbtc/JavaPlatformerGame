@@ -10,7 +10,7 @@ public class Config {
 	
 	public final static double NANOSECONDPERSEC = 1000000000.0;
 	
-	public final static Vector2D Gravity = new Vector2D(0, 450);
+	public final static Vector2D Gravity = new Vector2D(0, 650);
 	
 	public static class WindowProperties {
 		public final static int WINDOW_WIDTH = 900;
@@ -18,8 +18,8 @@ public class Config {
 	}	
 	
 	public static class PlayerProperties {
-		public final static double JumpForce = 350;
-		public final static double MaxMoveSpeed = 700;
+		public final static double JumpForce = 450;
+		public final static double MaxMoveSpeed = 800;
 		public final static double WalkingAccelerate = 2500;
 		
 		public final static int Width = 30;

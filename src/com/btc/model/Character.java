@@ -105,5 +105,8 @@ public abstract class Character extends GameObject {
 		return loadAnimations(this.getClassName(), animationName, repeat);
 	}
 	
+	public Character() {
+		// TODO Auto-generated constructor stub
+	}
 
 }

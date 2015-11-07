@@ -73,10 +73,14 @@ public class Crawler extends Enemy {
 	public void update(double dt) {
 		if (characterState == CharacterState.DEAD) {
 			// update animation only
+			this.desiredPosition = this.position;
 			super.update(dt);	
+			// when animation completed
+			
 			if (animation.animationCompleted(this.timeElapsedSinceStartAnimation)){
 				remove();			
 			} 
+			
 			return;
 		}
 		Double distance = Vector2DHelper.DistanceBetweeen(this.position, player.position);
@@ -106,4 +110,7 @@ public class Crawler extends Enemy {
 		super(imageNamed);
 		// TODO Auto-generated constructor stub
 	}	
+	public Crawler() {
+		// TODO Auto-generated constructor stub
+	}
 }

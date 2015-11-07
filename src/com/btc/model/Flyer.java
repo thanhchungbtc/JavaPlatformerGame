@@ -25,7 +25,9 @@ public class Flyer extends Enemy {
 	@Override
 	public void update(double dt) {
 		if (characterState == CharacterState.DEAD) {
-			// update animation only
+			// update animation only\
+			this.desiredPosition = this.position;
+			
 			super.update(dt);	
 			if (animation.animationCompleted(this.timeElapsedSinceStartAnimation)){
 				remove();			
@@ -68,4 +70,7 @@ public class Flyer extends Enemy {
 		super.update(dt);
 	}
 
+	public Flyer() {
+		// TODO Auto-generated constructor stub
+	}
 }

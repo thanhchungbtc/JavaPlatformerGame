@@ -20,6 +20,8 @@ public class Player extends Character {
 	public boolean shouldMoveLeft = false;
 	public boolean shouldMoveRight = false;
 	private boolean isInvulnerable = false;
+	
+	public Sprite lifeBarImage;
 	@Override
 	public void setTexture(Image newImage) {
 		// TODO Auto-generated method stub
@@ -92,9 +94,16 @@ public class Player extends Character {
 		life = 500;
 	}
 	
+	public Player() {
+		life = 500;
+	}
 	@Override
 	public void tookHit(Character character) {
+		
 		life -= 100;
+		
+		// set lifebar
+		
 		if (life <= 0) {
 			changeState(CharacterState.DEAD);
 		} else {
