@@ -135,22 +135,13 @@ public class Player extends Character {
 				isInvulnerable = false;
 			}
 		}
-		if (bouncing) {
-			bouncingTickcount++;
-			if (bouncingTickcount > 30){
-				isActive = true;
-				bouncing = false;
-				bouncingTickcount = 0;
-			}
-		}
+		
 		updateState(dt);
 		
 		Vector2D gravity = Config.Gravity;
 		Vector2D gravityStep = Vector2DHelper.MutilByScalar(gravity, dt);		
 		this.velocity = Vector2DHelper.AddVector(this.velocity, gravityStep);		
-		// clamp velocity
-//		 velocity = new Vector2D(Utilities.clamp(velocity.x, -Config.PlayerProperties.MaxMoveSpeed, Config.PlayerProperties.MaxMoveSpeed),
-//				Utilities.clamp(velocity.y, 0, 450));
+	
 		this.velocity = Vector2DHelper.clamped(this.velocity, Config.PlayerProperties.MaxMoveSpeed, 450.0);		
 		this.velocity = new Vector2D(this.velocity.x * 0.85, this.velocity.y);
 		Vector2D velocityStep = Vector2DHelper.MutilByScalar(this.velocity, dt);				
@@ -171,11 +162,7 @@ public class Player extends Character {
 		}
 	}
 	
-	boolean bouncing = false;
-	int bouncingTickcount = 0;
 	public void bounce() {
-		this.velocity = new Vector2D(this.velocity.x, -Config.PlayerProperties.JumpForce / 3);
-		this.isActive = false;
-		bouncing = true;
+		this.velocity = new Vector2D(this.velocity.x, -Config.PlayerProperties.JumpForce / 3);		
 	}
 }
