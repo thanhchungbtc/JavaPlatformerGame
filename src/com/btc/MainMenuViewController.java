@@ -43,7 +43,7 @@ public class MainMenuViewController extends Application {
 	private Button exitButton;
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		primaryStage.setTitle("Cyclops 's Advanture");
+		primaryStage.setTitle("Platformer Game");
 		Group root = new Group();
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);
