@@ -1,20 +1,15 @@
 package com.btc.model;
 
 import java.io.File;
-import java.net.MalformedURLException;
-
 import com.btc.SoundManager;
 import com.btc.Vector2D;
 import com.btc.helper.Vector2DHelper;
 import com.btc.model.Character.CharacterState;
 
-import javazoom.jlgui.basicplayer.BasicPlayer;
-import javazoom.jlgui.basicplayer.BasicPlayerException;
-
 public class Flyer extends Enemy {
 
-	BasicPlayer playAttackSound;
-	BasicPlayer playCloseEyeSound;
+	String playAttackSound;
+	String playCloseEyeSound;
 	
 	@Override
 	public void changeState(CharacterState newState) {
@@ -39,16 +34,9 @@ public class Flyer extends Enemy {
 	
 	public Flyer(String imageNamed) {
 		super(imageNamed);
-		try {			
-			playDyingSound = new BasicPlayer();
-			playDyingSound.open(new File("sounds/crawler_die.wav").toURL());	
-			playAttackSound = new BasicPlayer();
-			playAttackSound.open(new File("sounds/flyerattack.wav").toURL());		
-			playCloseEyeSound = new BasicPlayer();
-			playCloseEyeSound.open(new File("sounds/flyercloseeye.wav").toURL());
-		} catch (BasicPlayerException | MalformedURLException e) {
-			
-		}
+		playDyingSound = "sounds/crawler_die.wav";
+		playAttackSound = "sounds/flyerattack.wav";
+		playCloseEyeSound = "sounds/flyercloseeye.wav";		
 	}
 	
 	@Override

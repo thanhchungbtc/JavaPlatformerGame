@@ -12,8 +12,6 @@ import com.btc.helper.Vector2DHelper;
 import com.btc.model.Character.CharacterState;
 
 import javafx.scene.image.Image;
-import javazoom.jlgui.basicplayer.BasicPlayer;
-import javazoom.jlgui.basicplayer.BasicPlayerException;
 
 public class Crawler extends Enemy {
 
@@ -122,12 +120,7 @@ public class Crawler extends Enemy {
 
 	public Crawler(String imageNamed) {
 		super(imageNamed);
-		try {			
-			playDyingSound = new BasicPlayer();
-			playDyingSound.open(new File("sounds/crawler_die.wav").toURL());			
-		} catch (BasicPlayerException | MalformedURLException e) {
-			
-		}
+		playDyingSound = "sounds/crawler_die.wav";			
 	}	
 	public Crawler() {
 		// TODO Auto-generated constructor stub

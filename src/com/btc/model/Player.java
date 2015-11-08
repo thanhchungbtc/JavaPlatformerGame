@@ -23,30 +23,27 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import javazoom.jlgui.basicplayer.BasicPlayer;
-import javazoom.jlgui.basicplayer.BasicPlayerException;
 
 public class Player extends Character {
-	
+
 	// sound effect
-	BasicPlayer playJumpSound;
-	BasicPlayer playDyingSound;
-	BasicPlayer playBounceSound;
-	
+	String playJumpSound;
+	String playDyingSound;
+	String playBounceSound;
+
 	public boolean shouldJump = false;
 	public boolean shouldMoveLeft = false;
 	public boolean shouldMoveRight = false;
 	private boolean isInvulnerable = false;
-	
+	private boolean jumpReset = true;
+	private boolean canDoubleJump = true;
 	public Sprite lifeBarImage;
 	@Override
 	public void setTexture(Image newImage) {
 		// TODO Auto-generated method stub
 		super.setTexture(newImage);
 	}
-	
+
 	@Override	
 	public Rect collisionBoundingBox() {
 		Rect bounding = new Rect(this.desiredPosition.x - Config.PlayerProperties.Width / 2, 
@@ -55,102 +52,117 @@ public class Player extends Character {
 				Config.PlayerProperties.Height);
 		return new Rect(bounding.x, bounding.y, bounding.width, bounding.height);
 	}
-	
+
 	@Override
 	public void loadAnimations() {
 		frameDictionary.put(CharacterState.STANDING, this.loadAnimations("standingAnim", true));
 		frameDictionary.put(CharacterState.WALKING, this.loadAnimations("walkingAnim", true));
 		frameDictionary.put(CharacterState.JUMP_UP, this.loadAnimations("jumpUpAnim", false));
+		frameDictionary.put(CharacterState.DOUBLEJUMP, this.loadAnimations("jumpUpAnim", false));
 		frameDictionary.put(CharacterState.FALLING, this.loadAnimations("fallingAnim", false));	
 		frameDictionary.put(CharacterState.DEAD, this.loadAnimations("dyingAnim", false));	
 		this.changeState(CharacterState.STANDING);	
 	}
 	
-	
+	@Override
+	public void setOnGround(boolean onGround) {
+		
+		super.setOnGround(onGround);
+		if (onGround)this.canDoubleJump = true;
+	}
+
 	@Override
 	public void changeState(CharacterState newState) {
 		if (newState == characterState) return;
-		
+
 		switch (newState) {
 		case JUMP_UP:
-			SoundManager.playSound(playJumpSound);
+		case DOUBLEJUMP:
+			SoundManager.playSound(playJumpSound); 
 			break;
 		case DEAD:
 			SoundManager.playSound(playDyingSound);
 			break;
-	
+
 		default:
 			break;
 		}
 		super.changeState(newState);
-		
+
 	}
-	
+
 	@Override	
 	protected void updateState(double dt) {
 		CharacterState newState = this.characterState;
 
-		  Vector2D joyForce = Vector2D.zero;
-		  if (this.shouldMoveLeft) {		    
-		    joyForce = new Vector2D(-Config.PlayerProperties.WalkingAccelerate, 0);
-		  } else if (this.shouldMoveRight) {		    
-		    joyForce = new Vector2D(Config.PlayerProperties.WalkingAccelerate, 0);
-		  }
-
-		  Vector2D joyForceStep = Vector2DHelper.MutilByScalar(joyForce, dt);
-		  this.velocity = Vector2DHelper.AddVector(this.velocity, joyForceStep);
-
-		  if (this.shouldJump)
-		  {
-		    if (this.onGround) {
-		      this.velocity = new Vector2D(this.velocity.x, -Config.PlayerProperties.JumpForce);
-		      newState = CharacterState.JUMP_UP;
-		      this.onGround = false;
-		      
-		    } 
-		  } 
-		    
- 	     if (this.onGround) {
-			 if (!this.shouldMoveLeft && !this.shouldMoveRight)
-			    newState = CharacterState.STANDING;
-			 else  newState = CharacterState.WALKING;
-		} else if (this.characterState == CharacterState.JUMP_UP || newState == CharacterState.JUMP_UP) {
-			    newState = CharacterState.JUMP_UP;
-		} else {
-		 newState = CharacterState.FALLING;
+		Vector2D joyForce = Vector2D.zero;
+		if (this.shouldMoveLeft) {		    
+			joyForce = new Vector2D(-Config.PlayerProperties.WalkingAccelerate, 0);
+		} else if (this.shouldMoveRight) {		    
+			joyForce = new Vector2D(Config.PlayerProperties.WalkingAccelerate, 0);
 		}
-	    if (this.velocity.y > 0) 
-			  newState = CharacterState.FALLING;
-		 this.changeState(newState);
+
+		Vector2D joyForceStep = Vector2DHelper.MutilByScalar(joyForce, dt);	
+		this.velocity = Vector2DHelper.AddVector(this.velocity, joyForceStep);
+		if (this.shouldJump)
+		{
+			if (canDoubleJump && (this.characterState == CharacterState.FALLING || characterState == CharacterState.JUMP_UP) 
+					&& this.jumpReset) {
+				canDoubleJump = false;
+				newState = CharacterState.DOUBLEJUMP;
+				this.velocity = new Vector2D(this.velocity.x, -Config.PlayerProperties.JumpForce);
+			} else if (this.onGround && this.jumpReset) {
+				this.velocity = new Vector2D(this.velocity.x, -Config.PlayerProperties.JumpForce);
+				newState = CharacterState.JUMP_UP;
+				this.onGround = false;		      
+			}
+			this.jumpReset = false;
+
+		} else {
+			this.jumpReset = true;
+			if (this.velocity.y < -Config.PlayerProperties.JumpCutOff) {
+				this.velocity = new Vector2D(this.velocity.x, -Config.PlayerProperties.JumpCutOff);
+			}
+		}
+
+		if (this.onGround && !this.shouldMoveLeft && !this.shouldMoveRight) {			
+			newState = CharacterState.STANDING;
+			
+		} else if (this.onGround && (this.shouldMoveLeft || this.shouldMoveRight)) {
+			newState = CharacterState.WALKING;
+		}		
+		else if (newState == CharacterState.DOUBLEJUMP || characterState == CharacterState.DOUBLEJUMP) {
+			newState = CharacterState.DOUBLEJUMP;
+		}
+		else if (this.characterState == CharacterState.JUMP_UP || newState == CharacterState.JUMP_UP) {
+			newState = CharacterState.JUMP_UP;		
+		}
+		else {
+			newState = CharacterState.FALLING;
+		}
+		if (this.velocity.y > 0) 
+			newState = CharacterState.FALLING;
+		this.changeState(newState);
 	}
-	
+
 	public Player(String imageNamed) {
 		super(imageNamed);	
 		life = 500;
-		
-		try {
-			playJumpSound = new BasicPlayer();
-			playJumpSound.open(new File("sounds/jump1.mp3").toURL());
-			playDyingSound = new BasicPlayer();
-			playDyingSound.open(new File("sounds/player_die.wav").toURL());
-			playBounceSound = new BasicPlayer();
-			playBounceSound.open(new File("sounds/bounce.wav").toURL());
-			
-		} catch (BasicPlayerException | MalformedURLException e) {
-			
-		}
+		playJumpSound = "sounds/jump1.mp3";
+		playDyingSound = "sounds/player_die.wav";			
+		playBounceSound = "sounds/bounce.wav";
 	}
-	
+
 	public Player() {
 		life = 500;
 	}
-	
+
 	@Override
 	public void tookHit(Character character) {
 		setLife(life - 50);
 		if (life <= 0) {
 			changeState(CharacterState.DEAD);
-			
+
 		} else {
 			isActive = false;
 			isInvulnerable = true;
@@ -160,16 +172,16 @@ public class Player extends Character {
 				this.velocity = new Vector2D(80, -80);
 			}
 		}
-		
+
 	}
-		
+
 	public void setLife(int newLife) {
 		if (newLife == life) {
 			return;
 		}
 		life = newLife;
 		int lifeIdx = (newLife + 50) / 100;
-				
+
 		lifeIdx =(int) Utilities.clamp((double)lifeIdx, 0, 5);
 		// set lifebar
 		try {
@@ -179,7 +191,7 @@ public class Player extends Character {
 			e.printStackTrace();
 		}
 	}
-	
+
 	int invulnerableTickCount = 0;
 	int engameTickCount = 0;
 	@Override
@@ -196,7 +208,7 @@ public class Player extends Character {
 			} 
 			return;
 		}
-		
+
 		// logic comes here
 		if (isInvulnerable) {
 			invulnerableTickCount++;
@@ -206,22 +218,22 @@ public class Player extends Character {
 				isInvulnerable = false;
 			}
 		}
-		
+
 		updateState(dt);
-		
+
 		Vector2D gravity = Config.Gravity;
 		Vector2D gravityStep = Vector2DHelper.MutilByScalar(gravity, dt);		
 		this.velocity = Vector2DHelper.AddVector(this.velocity, gravityStep);		
-	
+
 		this.velocity = Vector2DHelper.clamped(this.velocity, Config.PlayerProperties.MaxMoveSpeed, 450.0);		
 		this.velocity = new Vector2D(this.velocity.x * 0.85, this.velocity.y);
 		Vector2D velocityStep = Vector2DHelper.MutilByScalar(this.velocity, dt);				
 		this.desiredPosition = Vector2DHelper.AddVector(this.position, velocityStep);
-		
+
 		// setup current frame for class	
 		super.update(dt);
 	}
-	
+
 	@Override
 	public void render(GraphicsContext gc) {
 		if (isInvulnerable) {
@@ -232,14 +244,16 @@ public class Player extends Character {
 			super.render(gc);
 		}
 	}
-	
+
 	public void endGame() {
 		GameScene gameScene = (GameScene)scene;
 		gameScene.looseGame();		
 	}
-	
+
 	public void bounce() {
+		this.setOnGround(true);
 		this.velocity = new Vector2D(this.velocity.x, -Config.PlayerProperties.JumpForce / 3);		
 		SoundManager.playSound(playBounceSound);
 	}
+
 }

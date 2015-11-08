@@ -38,14 +38,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javazoom.jlgui.basicplayer.BasicPlayer;
-import javazoom.jlgui.basicplayer.BasicPlayerException;
 
 public class GameScene extends Scene {
 	public Group root;
 	public Canvas canvas;
 
-	BasicPlayer playBackground;
+	String playBackground;
 	long lastUpdateTime = 0;
 	TileMap map;
 	Player player;
@@ -61,9 +59,10 @@ public class GameScene extends Scene {
 	List<PowerUp> powerUps;
 	Vector2D exitPoint;
 	int currentLevel = 1;
-	
+	AnimationTimer mainLoopManager;
 	public boolean loose = false;
 	public boolean gameRunning = true;
+	public boolean won = false;
 	public double gameHeight() {
 		return canvas.getHeight();
 	}
@@ -100,7 +99,7 @@ public class GameScene extends Scene {
 					}
 				});
 
-		new AnimationTimer() {
+		mainLoopManager = new AnimationTimer() {
 
 			@Override
 			public void handle(long currentTime) {		
@@ -108,7 +107,8 @@ public class GameScene extends Scene {
 				update(currentTime);				
 				render(canvas.getGraphicsContext2D());
 			}
-		}.start();
+		};
+		mainLoopManager.start();
 	}
 
 	private void addSprite(Sprite sprite) {
@@ -118,10 +118,6 @@ public class GameScene extends Scene {
 	}
 
 	private void setupPlayer() {
-//		player = new Player("/sprites/Player1.png");
-//		map.addChild(player);
-//		player.isActive = true;
-//		player.position = new Vector2D(100, 300);
 		player = map.player;
 		player.setScene(this);
 		player.lifeBarImage = this.lifeBarImage;
@@ -133,24 +129,28 @@ public class GameScene extends Scene {
 
 	private void checkForExit() {
 		Vector2D playerPositionInMap = Vector2DHelper.SubstractVector(player.position, map.position); 
+		
 		double distance = Vector2DHelper.DistanceBetweeen(playerPositionInMap, exitPoint);
+		
 		if (distance < 100) { // level clear
 			currentLevel++;
-			newLevel();
+			System.out.println(currentLevel);
+			if (currentLevel <= 3)
+				newLevel();
+			else {
+				gameRunning = false;
+				// won
+				won = true;
+				wonGame();
+			}
 		}
 	}
 	
 	private void newLevel() {
+		SoundManager.stopBackGroundMusic();
+		playBackground = "sounds/lvl" + currentLevel + ".mp3";
+		SoundManager.playBackGroundMusic(playBackground);
 		
-		
-		try {			
-			
-			playBackground = new BasicPlayer();
-			playBackground.open(new File("sounds/lvl" + currentLevel + ".mp3").toURL());
-			SoundManager.playSound(playBackground);
-		} catch (BasicPlayerException | MalformedURLException e) {
-			e.printStackTrace();
-		}
 		map = new TileMap(this, currentLevel);
 		double gameHeight = this.gameHeight();
 		double diffHeight = map.mapHeightInPixel() - gameHeight;
@@ -163,8 +163,6 @@ public class GameScene extends Scene {
 		loadEnemies();
 		powerUps = map.powerUps;
 		exitPoint = map.exitPoint;
-		System.out.println(exitPoint.x);
-		
 	}
 	
 	private void checkForEnemyCollisions(Enemy enemy) {
@@ -286,7 +284,6 @@ public class GameScene extends Scene {
 			for(PowerUp powerUp: powerUpsToRemove) {
 				this.powerUps.remove(powerUp);
 				this.map.removeChild(powerUp);
-				System.out.println(powerUps.size());
 			}
 		}
 	}	
@@ -297,19 +294,25 @@ public class GameScene extends Scene {
 		newLevel();
 	}
 	
-	public void looseGame() {
-		try {
-			playBackground.stop();
-			
-			gameRunning = false;
-			Text text = new Text(gameWidth() / 2 - 100, gameHeight() / 2, "YOU LOOSE");
-			text.setFont(Font.font("Chalkduster", FontWeight.BOLD, 50));
-			text.setFill(Color.WHITE);
-			root.getChildren().add(text);
-		} catch (BasicPlayerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void looseGame() {		
+		SoundManager.stopBackGroundMusic();
+
+		gameRunning = false;
+		Text text = new Text(gameWidth() / 2 - 100, gameHeight() / 2, "YOU LOOSE");
+		text.setFont(Font.font("Chalkduster", FontWeight.BOLD, 50));
+		text.setFill(Color.WHITE);
+		root.getChildren().add(text);		
+	}
+	
+	public void wonGame() {
+		SoundManager.stopBackGroundMusic();
+		SoundManager.playSound("sounds/victory.mp3");
+		// play won sound
+		gameRunning = false;
+		Text text = new Text(gameWidth() / 2 - 100, gameHeight() / 2, "YOU WON!!!");
+		text.setFont(Font.font("Chalkduster", FontWeight.BOLD, 50));
+		text.setFill(Color.WHITE);
+		root.getChildren().add(text);
 	}
 
 	public void handleEvents(List<String> input) {
@@ -336,16 +339,19 @@ public class GameScene extends Scene {
 			Vector2D centerOfView = new Vector2D(gameWidth() / 2, gameHeight() / 2);
 			double distanceToCenter = player.position.x - centerOfView.x;
 			map.setPosition(new Vector2D(map.position.x - distanceToCenter, map.position.y));
-			//player.position = new Vector2D(player.position.x - distanceToCenter, player.position.y);
 		} 
 		if (locationInMap.y > gameHeight() / 2 && locationInMap.y < map.mapHeightInPixel() - gameHeight() / 2) {
 
 			Vector2D centerOfView = new Vector2D(gameWidth() / 2, gameHeight() / 2);
 			double distanceToCenter = player.position.y - centerOfView.y;
 			map.setPosition(new Vector2D(map.position.x, map.position.y - distanceToCenter));
-			//player.position = new Vector2D(player.position.x, player.position.y - distanceToCenter);
 		} 
 
+	}
+
+	public void backToMainMenu() {
+		mainLoopManager.stop();
+		SoundManager.stopBackGroundMusic();
 	}
 
 	public void update(long currentTime) {
@@ -380,7 +386,6 @@ public class GameScene extends Scene {
 			}
 		}		
 		if (enemiesToDelete != null) {
-			System.out.println(enemiesToDelete.size());
 			for (Enemy enemy: enemiesToDelete) {
 				enemies.remove(enemy);
 				map.removeChild(enemy);
@@ -389,7 +394,7 @@ public class GameScene extends Scene {
 			enemiesToDelete.clear();
 		}
 		this.checkForPowerUp();
-
+		
 		moveMapCenterPlayer(dt);
 		// for debug purpose
 		if (debugInterval >= 30) {

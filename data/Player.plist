@@ -12,9 +12,9 @@
 	<key>fallingAnim</key>
 	<dict>
 		<key>animationFrames</key>
-		<string>10,11,12,13,14,15</string>
+		<string>8,9,10,11,12,13,14</string>
 		<key>delay</key>
-		<real>0.1</real>
+		<real>0.06</real>
 	</dict>
 	<key>walkingAnim</key>
 	<dict>
@@ -26,9 +26,9 @@
 	<key>jumpUpAnim</key>
 	<dict>
 		<key>animationFrames</key>
-		<string>5,6,7,8,9</string>
+		<string>5,6,7</string>
 		<key>delay</key>
-		<real>0.075</real>
+		<real>0.06</real>
 	</dict>
 	<key>wallSlideAnim</key>
 	<dict>

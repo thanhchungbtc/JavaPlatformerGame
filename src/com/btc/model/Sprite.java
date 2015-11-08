@@ -3,6 +3,9 @@ package com.btc.model;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.PrimitiveIterator.OfDouble;
 
 import com.btc.*;
@@ -41,7 +44,12 @@ public class Sprite {
 	
 	public Sprite(String imageNamed) {
 		
-		this.image = new Image(imageNamed);
+		try {
+			this.image = new Image(new FileInputStream(imageNamed));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		this.position = Vector2D.zero;
 		this.size = new Size(image.getWidth(), image.getHeight());
 	}

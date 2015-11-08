@@ -162,28 +162,28 @@ public class TileMap extends GameObject {
 		for (int i = 0; i < layerNum[0]; i++) {
 			Sprite background1 = new Sprite("images/" + levelName + "1-" + (i + 1) + ".png");
 			GameScene gameScene = (GameScene)this.scene;
-			background1.position = new Vector2D(gameScene.gameWidth() / 2 + gameScene.gameWidth() * i, gameScene.gameHeight() / 2 - 100);
+			background1.position = new Vector2D(background1.size.width / 2 + background1.size.width * i, background1.size.height / 2 - 100);
 			backgroundLayer1.add(background1);
 		}
 		backgroundLayer2 = new LinkedList<Sprite>();
 		for (int i = 0; i < layerNum[1]; i++) {
 			Sprite background1 = new Sprite("images/" + levelName + "2-" + (i + 1) + ".png");
 			GameScene gameScene = (GameScene)this.scene;
-			background1.position = new Vector2D(gameScene.gameWidth() / 2 + gameScene.gameWidth() * i, gameScene.gameHeight() / 2 - 100);
+			background1.position = new Vector2D(background1.size.width / 2 + background1.size.width * i,background1.size.height / 2 - 100);
 			backgroundLayer2.add(background1);
 		}
 		backgroundLayer3 = new LinkedList<Sprite>();
 		for (int i = 0; i < layerNum[2]; i++) {
 			Sprite background1 = new Sprite("images/" + levelName + "3-" + (i + 1) + ".png");
 			GameScene gameScene = (GameScene)this.scene;
-			background1.position = new Vector2D(gameScene.gameWidth() / 2 + gameScene.gameWidth() * i, gameScene.gameHeight() / 2 - 100);
+			background1.position = new Vector2D(background1.size.width / 2 + background1.size.width * i, background1.size.height / 2 - 100);
 			backgroundLayer3.add(background1);
 		}
 		backgroundLayer4 = new LinkedList<Sprite>();
 		for (int i = 0; i < layerNum[3]; i++) {
 			Sprite background1 = new Sprite("images/" + levelName + "4-" + (i + 1) + ".png");
 			GameScene gameScene = (GameScene)this.scene;
-			background1.position = new Vector2D(gameScene.gameWidth() / 2 + gameScene.gameWidth() * i, gameScene.gameHeight() / 2 - 100);
+			background1.position = new Vector2D(background1.size.width / 2 + background1.size.width * i, background1.size.height/ 2 - 100);
 			backgroundLayer4.add(background1);
 		}
 	}
@@ -245,16 +245,16 @@ public class TileMap extends GameObject {
 			sprite.position = Vector2DHelper.SubstractVector(sprite.position, offset);
 		}
 		for (Sprite background: this.backgroundLayer1) {
-			background.position = Vector2DHelper.SubstractVector(background.position, Vector2DHelper.MutilByScalar(offset, 0.5));
+			background.position = Vector2DHelper.SubstractVector(background.position, Vector2DHelper.MutilByScalar(offset, 0.4));
 		}
 		for (Sprite background: this.backgroundLayer2) {
 			background.position = Vector2DHelper.SubstractVector(background.position, Vector2DHelper.MutilByScalar(offset, 0.3));
 		}
 		for (Sprite background: this.backgroundLayer3) {
-			background.position = Vector2DHelper.SubstractVector(background.position, Vector2DHelper.MutilByScalar(offset, 0.2));
+			background.position = Vector2DHelper.SubstractVector(background.position, Vector2DHelper.MutilByScalar(offset, 0.1));
 		}
 		for (Sprite background: this.backgroundLayer4) {
-			background.position = Vector2DHelper.SubstractVector(background.position, Vector2DHelper.MutilByScalar(offset, 0.1));
+			background.position = Vector2DHelper.SubstractVector(background.position, Vector2DHelper.MutilByScalar(offset, 0.05));
 		}
 		this.position = position;
 	}

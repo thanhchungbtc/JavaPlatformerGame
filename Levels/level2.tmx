@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="500" height="25" tilewidth="32" tileheight="32" nextobjectid="105">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="500" height="25" tilewidth="32" tileheight="32" nextobjectid="145">
  <tileset firstgid="1" name="tilesetd" tilewidth="32" tileheight="32" tilecount="25">
   <image source="tilesetd.png" width="160" height="160"/>
  </tileset>
@@ -33,8 +33,8 @@
 </data>
  </layer>
  <objectgroup name="objects">
-  <object id="53" name="player" type="player" x="115" y="583" width="26" height="16"/>
-  <object id="54" name="exit" type="exit" x="15866" y="586" width="126" height="134"/>
+  <object id="53" name="player" type="player" x="15000" y="583" width="26" height="16"/>
+  <object id="54" name="exit" type="exit" x="15960.6" y="619.166" width="25.6718" height="23.8429"/>
  </objectgroup>
  <objectgroup name="enemies">
   <object id="55" name="Crawler" type="Crawler" x="807" y="683" width="11" height="12"/>

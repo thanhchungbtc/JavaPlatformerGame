@@ -1,7 +1,6 @@
 package com.btc.model;
 
 import java.io.File;
-import java.net.MalformedURLException;
 
 import com.btc.SoundManager;
 import com.btc.Vector2D;
@@ -9,22 +8,14 @@ import com.btc.config.Config;
 import com.btc.helper.Utilities;
 import com.btc.helper.Vector2DHelper;
 
-import javazoom.jlgui.basicplayer.BasicPlayer;
-import javazoom.jlgui.basicplayer.BasicPlayerException;
 
 public class MeanCrawler extends Enemy {
 
-	BasicPlayer playJumpSound;
+	String playJumpSound;
 	public MeanCrawler(String imageNamed) {
-		super(imageNamed);
-		try {			
-			playDyingSound = new BasicPlayer();
-			playDyingSound.open(new File("sounds/crawler_die.wav").toURL());		
-			playJumpSound = new BasicPlayer();
-			playJumpSound.open(new File("sounds/crawler_jump.wav").toURL());
-		} catch (BasicPlayerException | MalformedURLException e) {
-			
-		}
+		super(imageNamed);	
+		playDyingSound = "sounds/crawler_die.wav";
+		playJumpSound = "sounds/crawler_jump.wav";		
 	}
 	
 	@Override

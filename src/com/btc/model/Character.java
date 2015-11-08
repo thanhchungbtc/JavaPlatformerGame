@@ -1,5 +1,6 @@
 package com.btc.model;
 
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +14,7 @@ import xmlwise.Plist;
 
 public abstract class Character extends GameObject {
 	public enum CharacterState {
-		STANDING, WALKING, JUMP_UP, FALLING, DEAD, SEEKING, ATTACKING, HIDING
+		STANDING, WALKING, JUMP_UP, DOUBLEJUMP, FALLING, DEAD, SEEKING, ATTACKING, HIDING
 	}
 	protected Map<CharacterState, AnimatedImage> frameDictionary;	
 	protected double timeElapsedSinceStartAnimation; // second	
@@ -90,7 +91,7 @@ public abstract class Character extends GameObject {
 			
 			Image[] images = new Image[imageNames.length];
 			for (int i = 0; i < images.length; i++) {
-				images[i] = new Image("sprites/" + className + imageNames[i] + ".png");
+				images[i] = new Image(new FileInputStream("sprites/" + className + imageNames[i] + ".png"));
 			}
 			AnimatedImage result = new AnimatedImage(images, duration, repeat);
 			return result;
